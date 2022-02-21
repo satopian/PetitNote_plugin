@@ -1,5 +1,4 @@
 <?php
-//POTI-board→Petit Note ログコンバータ (c)さとぴあ @satopian 2022
 
 //設定ファイル
 if ($err = check_file(__DIR__.'/config.php')) {
@@ -20,8 +19,17 @@ require(__DIR__.'/templates/template_ini.php');
 	$line = file(TREEFILE);
 
 	$trees=array_reverse($trees, false);
-	if (!is_dir('log')){
-		mkdir('log', 606);
+	if (!is_dir('petit')){
+		mkdir('petit', 606);
+	}
+	if (!is_dir('petit/log')){
+		mkdir('petit/log', 606);
+	}
+	if (!is_dir('petit/src')){
+		mkdir('petit/src', 606);
+	}
+	if (!is_dir('petit/thumb')){
+		mkdir('petit/thumb', 606);
 	}
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
@@ -36,16 +44,34 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 
 				$no=$i+1;
 
-				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
-				=explode(",",trim($line[$j]));
+				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
+				=explode(",",rtrim($line[$j]));
 
-				$imgfile=$ext ? $imgfile=$time.$ext:'';
-				$time=substr($time,-13);
 				list($userid, $now) = separateDatetimeAndId($date);
 				//日付と編集マークを分離
 				list($now, $updatemark) = separateDatetimeAndUpdatemark($now);
 				//名前とトリップを分離
 				list($name, $trip) = separateNameAndTrip($name);
+
+				$time=substr($_time,-13);
+
+				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
+					copy("src/{$_time}{$ext}","petit/src/{$time}{$ext}");
+					chmod("petit/src/{$time}{$ext}",0606);
+				}
+				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
+					$thumbnail='thumbnail';
+					copy("src/{$_time}s.jpg","petit/src/{$time}s.jpg");
+					chmod("petit/thumbnail/{$time}s.jpg",0606);
+				}
+				
+				if($pchext && is_file(PCH_DIR."{$_time}{$pchext}")){//動画
+					copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
+					chmod("petit/src/{$time}{$pchext}",0606);
+				}
+	
+				$imgfile=$ext ? $imgfile=$time.$ext:'';
+
 
 				$com=str_replace('<br />','"\n"',$com);
 
@@ -66,12 +92,11 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 
 				if($k===0){//スレッドの親の時
 
-
 					$oya = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
-					file_put_contents('log/alllog.log',$oya,FILE_APPEND | LOCK_EX);
 
 					$thread[$i][]=$oya;
-				}else{//スレッドのレスの時
+					$oya_arr[]=$oya;
+				}else{
 				
 					$res = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\tres\n";
 
@@ -80,15 +105,13 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 
 				}
 			}
-		file_put_contents('log/'.$no.'.log',$thread[$i]);
+				file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
 }
 
-$alllog_arr=file('log/alllog.log');
-$alllog_arr=array_reverse($alllog_arr, false);
-file_put_contents('log/alllog.log',$alllog_arr);
+$oya_arr=array_reverse($oya_arr, false);
+file_put_contents('petit/log/alllog.log',$oya_arr);
 
 echo'変換終了。リロードしないでください。';
-
 function lang_en(){//言語が日本語以外ならtrue。
 	$lang = ($http_langs = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '')
 	? explode( ',', $http_langs )[0] : '';
@@ -112,7 +135,6 @@ function check_file ($path,$check_writable='') {
 		if (!is_writable($path)) return $path . $msg['003']."<br>";
 	}
 }
-
 //逆変換テーブル作成
 function get_lineindex ($line){
 	$lineindex = [];
@@ -120,7 +142,7 @@ function get_lineindex ($line){
 		if($value !==''){
 			list($no,) = explode(",", $value);
 			if(!is_numeric($no)){//記事Noが正しく読み込まれたかどうかチェック
-				error(MSG019);
+				// error(MSG019);
 			};
 			$lineindex[$no] = $i; // 値にkey keyに記事no
 		}
