@@ -5,15 +5,8 @@ if ($err = check_file(__DIR__.'/config.php')) {
 	echo $err;
 	exit;
 }
-//Template設定ファイル
-if ($err = check_file(__DIR__.'/templates/'.'template_ini.php')) {
-	echo $err;
-	exit;
-}
-
 
 require(__DIR__.'/config.php');
-require(__DIR__.'/templates/template_ini.php');
 
 	$trees = file(LOGFILE);
 	$line = file(TREEFILE);
@@ -47,8 +40,6 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
 				=explode(",",rtrim($line[$j]));
 
-				list($userid, $now) = separateDatetimeAndId($date);
-				//日付と編集マークを分離
 				list($now, $updatemark) = separateDatetimeAndUpdatemark($now);
 				//名前とトリップを分離
 				list($name, $trip) = separateNameAndTrip($name);
@@ -120,9 +111,9 @@ function lang_en(){//言語が日本語以外ならtrue。
 }
 function initial_error_message(){
 	$en=lang_en();
-	$msg['001']=defined('MSG041') ? MSG041 :($en ? ' does not exist.':'がありません。'); 
-	$msg['002']=defined('MSG042') ? MSG042 :($en ? ' is not readable.':'を読めません。'); 
-	$msg['003']=defined('MSG043') ? MSG043 :($en ? ' is not writable.':'を書けません。'); 
+	$msg['001']=$en ? ' does not exist.':'がありません。'; 
+	$msg['002']=$en ? ' is not readable.':'を読めません。'; 
+	$msg['003']=$en ? ' is not writable.':'を書けません。'; 
 return $msg;	
 }
 
@@ -172,17 +163,5 @@ function separateNameAndTrip ($name) {
 		return [preg_replace("/(◆.*)/","",$name), $regs[1]];
 	}
 	return [$name, ''];
-}
-
-/**
- * 日付と編集マークを分離
- * @param $date
- * @return array
- */
-function separateDatetimeAndUpdatemark ($date) {
-	if (UPDATE_MARK && strpos($date, UPDATE_MARK) !== false){
-		return [str_replace(UPDATE_MARK,"",$date), UPDATE_MARK];
-	}
-	return [$date, ''];
 }
 
