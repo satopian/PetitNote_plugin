@@ -1,7 +1,17 @@
 <?php
+// (c)2022 POTI-board → Petit Note ログコンバータ。
+//設定項目はありません。
 
-//設定ファイル
+//設定ファイルの読み込み
 if ($err = check_file(__DIR__.'/config.php')) {
+	echo $err;
+	exit;
+}
+if ($err = check_file(__DIR__.'/'.LOGFILE)) {
+	echo $err;
+	exit;
+}
+if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 	echo $err;
 	exit;
 }
@@ -13,21 +23,23 @@ require(__DIR__.'/config.php');
 
 	$trees=array_reverse($trees, false);
 	if (!is_dir('petit')){
-		mkdir('petit', 606);
+		mkdir('petit', 0606);
 	}
 	if (!is_dir('petit/log')){
-		mkdir('petit/log', 606);
+		mkdir('petit/log', 0606);
 	}
 	if (!is_dir('petit/src')){
-		mkdir('petit/src', 606);
+		mkdir('petit/src', 0606);
 	}
 	if (!is_dir('petit/thumb')){
-		mkdir('petit/thumb', 606);
+		mkdir('petit/thumb', 0606);
 	}
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
-foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
+foreach($trees as $i=>$tree){//ツリーの読み込み
 			$treeline = explode(",", rtrim($tree));
+
+			var_dump($treeline);
 			// レス省略
 			//レス作成
 			$thread=[];
@@ -37,10 +49,13 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 
 				$no=$i+1;
 
-				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
+				// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
+				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,)
 				=explode(",",rtrim($line[$j]));
 
-				list($now, $updatemark) = separateDatetimeAndUpdatemark($now);
+				$com=strip_tags($com);
+
+				$painttime=is_numeric($_ptime) ? $_ptime :''; 
 				//名前とトリップを分離
 				list($name, $trip) = separateNameAndTrip($name);
 
@@ -56,7 +71,9 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 					chmod("petit/thumbnail/{$time}s.jpg",0606);
 				}
 				
-				if($pchext && is_file(PCH_DIR."{$_time}{$pchext}")){//動画
+				$pchext=check_pch_ext (PCH_DIR.$_time);
+				
+				if($pchext){//動画
 					copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
 					chmod("petit/src/{$time}{$pchext}",0606);
 				}
@@ -72,10 +89,10 @@ foreach($trees as $i=>$tree){//PAGE_DEF分のスレッドを表示
 					$tool='しぃペインター';
 					}
 					elseif($pchext==='.pch'){
-					$tool='PaintBBS NEO';
+					$tool='neo';
 					}
 					elseif($pchext==='.chi'){
-					$tool='ChickenPaint';
+					$tool='chi';
 					}
 					elseif($ext){
 					$tool='???';
@@ -140,17 +157,6 @@ function get_lineindex ($line){
 	}
 	return $lineindex;
 }
-/**
- * 日付とIDを分離
- * @param $date
- * @return array
- */
-function separateDatetimeAndId ($date) {
-	if (preg_match("/( ID:)(.*)/", $date, $regs)){
-		return [$regs[2], preg_replace("/( ID:.*)/","",$date)];
-	}
-	return ['', $date];
-}
 
 /**
  * 名前とトリップを分離
@@ -165,3 +171,18 @@ function separateNameAndTrip ($name) {
 	return [$name, ''];
 }
 
+/**
+ * pchかspchか、それともファイルが存在しないかチェック
+ * @param $filepath
+ * @return string
+ */
+function check_pch_ext ($filepath) {
+	if (is_file($filepath . ".pch")) {
+		return ".pch";
+	} elseif (is_file($filepath . ".spch")) {
+		return ".spch";
+	} elseif (is_file($filepath . ".chi")) {
+		return ".chi";
+	}
+	return '';
+}
