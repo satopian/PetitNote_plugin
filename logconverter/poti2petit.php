@@ -7,6 +7,7 @@ if ($err = check_file(__DIR__.'/config.php')) {
 	echo $err;
 	exit;
 }
+require(__DIR__.'/config.php');
 if ($err = check_file(__DIR__.'/'.LOGFILE)) {
 	echo $err;
 	exit;
@@ -16,10 +17,9 @@ if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 	exit;
 }
 
-require(__DIR__.'/config.php');
 
-	$trees = file(LOGFILE);
-	$line = file(TREEFILE);
+	$trees = file(TREEFILE);
+	$line = file(LOGFILE);
 
 	$trees=array_reverse($trees, false);
 	if (!is_dir('petit')){
@@ -31,15 +31,13 @@ require(__DIR__.'/config.php');
 	if (!is_dir('petit/src')){
 		mkdir('petit/src', 0606);
 	}
-	if (!is_dir('petit/thumb')){
-		mkdir('petit/thumb', 0606);
+	if (!is_dir('petit/thumbnail')){
+		mkdir('petit/thumbnail', 0606);
 	}
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
 foreach($trees as $i=>$tree){//ツリーの読み込み
 			$treeline = explode(",", rtrim($tree));
-
-			var_dump($treeline);
 			// レス省略
 			//レス作成
 			$thread=[];
@@ -53,21 +51,22 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,)
 				=explode(",",rtrim($line[$j]));
 
-				$com=strip_tags($com);
-
 				$painttime=is_numeric($_ptime) ? $_ptime :''; 
 				//名前とトリップを分離
 				list($name, $trip) = separateNameAndTrip($name);
 
+				list($userid,) = separateDatetimeAndId($date);
+
 				$time=substr($_time,-13);
 
 				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
-					copy("src/{$_time}{$ext}","petit/src/{$time}{$ext}");
+					copy(IMG_DIR.$_time.$ext,"petit/src/{$time}{$ext}");
 					chmod("petit/src/{$time}{$ext}",0606);
 				}
+				$thumbnail='';
 				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
 					$thumbnail='thumbnail';
-					copy("src/{$_time}s.jpg","petit/src/{$time}s.jpg");
+					copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
 					chmod("petit/thumbnail/{$time}s.jpg",0606);
 				}
 				
@@ -81,7 +80,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				$imgfile=$ext ? $imgfile=$time.$ext:'';
 
 
-				$com=str_replace('<br />','"\n"',$com);
+				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を改行に戻す
+				$com=strip_tags($com);
 
 				$tool='';
 				
@@ -169,6 +169,17 @@ function separateNameAndTrip ($name) {
 		return [preg_replace("/(◆.*)/","",$name), $regs[1]];
 	}
 	return [$name, ''];
+}
+/**
+ * 日付とIDを分離
+ * @param $date
+ * @return array
+ */
+function separateDatetimeAndId ($date) {
+	if (preg_match("/( ID:)(.*)/", $date, $regs)){
+		return [$regs[2], preg_replace("/( ID:.*)/","",$date)];
+	}
+	return ['', $date];
 }
 
 /**
