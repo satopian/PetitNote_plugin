@@ -16,7 +16,7 @@ $default='';
 
 $arr=[];
 
-	$i=0;$j=0;
+	$i=0;
 
 	$fp=fopen('./log/'."alllog.log","r");
 	while ($log = fgets($fp)) {
@@ -45,7 +45,7 @@ $arr=[];
 	fclose($fp);
 
 if($arr){
-krsort($arr);//連想配列を値でソート
+krsort($arr);//連想配列をキーでソート
 $arr=array_values($arr);
 $filename=$arr[0];
 }else{
