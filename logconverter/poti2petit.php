@@ -1,5 +1,7 @@
 <?php
-// (c)2022 POTI-board → Petit Note ログコンバータ。
+// POTI-board → Petit Note ログコンバータ。
+// (c)2022 さとぴあ(satopian) 
+//Licence MIT
 
 //設定項目
 
@@ -102,21 +104,23 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 
 				$tool='';
 				
-				if($pchext==='.spch'){
-					$tool='しぃペインター';
-					}
-					elseif($pchext==='.pch'){
-					$tool='neo';
-					}
-					elseif($pchext==='.chi'){
-					$tool='chi';
-					}
-					elseif($pchext==='.psd'){
-					$tool='Klecks';
-					}
-					elseif($ext){
-					$tool='???';
-					}
+				switch($pchext){
+					case '.pch':
+						$tool='neo';
+						break;
+					case '.spch':
+						$tool='shi-Painter';
+						break;
+					case '.chi':
+						$tool='chi';
+						break;
+					case '.psd':	
+						$tool='klecks';
+						default:
+						if($ext){
+							$tool='???';
+						}
+				}
 
 				if($k===0){//スレッドの親の時
 
@@ -139,6 +143,7 @@ $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
 
 echo'変換終了。リロードしないでください。';
+
 function lang_en(){//言語が日本語以外ならtrue。
 	$lang = ($http_langs = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '')
 	? explode( ',', $http_langs )[0] : '';
@@ -212,7 +217,7 @@ function separateDatetimeAndId ($date) {
  * @return string
  */
 function check_pch_ext ($filepath) {
-	if (is_file($filepath . ".pch")) {
+	if (is_file($filepath . ".pch") && is_neo($filepath . ".pch")) {
 		return ".pch";
 	} elseif (is_file($filepath . ".spch")) {
 		return ".spch";
@@ -223,3 +228,11 @@ function check_pch_ext ($filepath) {
 	}
 	return '';
 }
+
+function is_neo($src) {//neoのPCHかどうか調べる
+	$fp = fopen("$src", "rb");
+	$is_neo=(fread($fp,3)==="NEO");
+	fclose($fp);
+	return $is_neo;
+}
+
