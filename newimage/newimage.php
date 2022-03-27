@@ -31,7 +31,7 @@ $arr=[];
 
 				if ($imgfile){
 					if($thumbnail){
-						$imgfile='thumbnail/'.$time.'s.jpg';
+						$arr[$time]='thumbnail/'.$time.'s.jpg';
 					}else{
 						$arr[$time]='src/'.$imgfile;
 					}
