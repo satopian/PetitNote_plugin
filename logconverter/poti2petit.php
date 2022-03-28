@@ -116,10 +116,12 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 						break;
 					case '.psd':	
 						$tool='klecks';
-						default:
+						break;
+					default:
 						if($ext){
 							$tool='???';
 						}
+						break;
 				}
 
 				if($k===0){//スレッドの親の時
