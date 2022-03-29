@@ -6,11 +6,6 @@
 
 /* ------------- 設定項目ここから ------------- */
 
-/* --------------- パスワード ---------------- */
-
-//管理者以外実行できないようにパスワードをセット
-$admin_pass='hoge';//必ず変更してください
-
 /* ------------- BBSNoteログ設定 ------------- */
 
 //BBSNoteのconfig.cgiの設定にあわせます。
@@ -157,118 +152,116 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 	foreach($logs as $i=> $log){
 	
 		foreach($log as $k=>$val){//1スレッド分のログを処理
-		// var_dump($val);
-		$no=$i+1;
-		if($k===0){//スレッドの親
-			if($relm){//relm
-			list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$ptime,)
-				=explode("<>",$val);
-			}else{//BBSNote
-			list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,$painttime,$applet,$_thumbnail)
-				=explode("\t",$val);
-			$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
-			$time=(int)strtotime($time);//strからUNIXタイムスタンプ
-			}
-
-			$time=$time ? $time*1000 : 0; 
-			$ext = $filename ? '.'.pathinfo($filename,PATHINFO_EXTENSION ) :'';
-			$_pchext = pathinfo($pch,PATHINFO_EXTENSION );
-
-			$ext = (!in_array($ext, ['.pch', '.spch'])) ? $ext : ''; 
-			$_pchext =  (in_array($_pchext, ['pch', 'spch'])) ? $_pchext : '';
-			$is_img=false;
-			//POTI-board形式のファイル名に変更してコピー
-			if($ext && is_file("data/$filename")){//画像
-				if($save_at_synonym && is_file("petit/src/{$time}{$ext}")){
-						$time=$time+1;
-				}
-
-				$is_img=true;	
-				$imgfile=$time.$ext;
-				copy("data/$filename","petit/src/{$imgfile}");
-				chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
-			}
-			$pch_fname=pathinfo($pch,PATHINFO_FILENAME);
-			
-			$pchext=check_pch_ext($bbsnote_log_dir.$pch_fname);
-			if($pchext && is_file($bbsnote_log_dir.$pch)){//動画
-				copy($bbsnote_log_dir.$pch,"petit/src/$time.$pchext");
-				chmod("petit/src/$time.$pchext",PERMISSION_FOR_DEST);
-				$pchext=$_pchext;
-			}
-
-			$tool='';
-				
-			switch($pchext){
-				case '.pch':
-					$tool='neo';
-					break;
-				case '.spch':
-					$tool='shi-Painter';
-					break;
-				default:
-					if($ext){
-						$tool='???';
-					}
-					break;
-			}
-			$thumbnail='';
-			if($usethumb&&$is_img&&($thumbnail_size=thumb("petit/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
-				$W=$thumbnail_size['w'];
-				$H=$thumbnail_size['h'];
-				$thumbnail='thumbnail';
-			}
-
-			$url = str_replace([" ","　","\t"],'',$url);
-			if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
-				$url="";
-			}
-			$url=$url ? $http.$url :'';
-			$sub = $sub ? $sub : $defalt_subject;
-			$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
-			$com=strip_tags($com);
-
-			$oya = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
-			$oya_arr[]=$oya;
-			$thread[$i][]=$oya;
-
-
-			$resub=$sub ? "Re: {$sub}" :'';
-
-		}else{//スレッドの子
-			unset($threadno,$_no,$now,$name,$sub,$email,$url,$com,$time,$ip,$host,$agent,$filename,$W,$painttime,$thumbnail,$pch,$applet);
-			$W=$H=$pch=$ptime=$ext=$time=$ip='';
-			if($relm){//relm
-				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host)
-				=explode("<>",$val);
-			}else{//BBSNote
-				list($_no,$name,$now,$com,,$host,$email,$url)
-				=explode("\t",$val);
+			// var_dump($val);
+				$no=$i+1;
+				if($k===0){//スレッドの親
+				if($relm){//relm
+				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$ptime,)
+					=explode("<>",$val);
+				}else{//BBSNote
+				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,$painttime,$applet,$_thumbnail)
+					=explode("\t",$val);
 				$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
 				$time=(int)strtotime($time);//strからUNIXタイムスタンプ
+				}
+
+				$time=$time ? $time*1000 : 0; 
+				$ext = $filename ? '.'.pathinfo($filename,PATHINFO_EXTENSION ) :'';
+				$_pchext = pathinfo($pch,PATHINFO_EXTENSION );
+
+				$ext = (!in_array($ext, ['.pch', '.spch'])) ? $ext : ''; 
+				$_pchext =  (in_array($_pchext, ['pch', 'spch'])) ? $_pchext : '';
+				$is_img=false;
+				//POTI-board形式のファイル名に変更してコピー
+				if($ext && is_file("data/$filename")){//画像
+					if($save_at_synonym && is_file("petit/src/{$time}{$ext}")){
+							$time=$time+1;
+					}
+
+					$is_img=true;	
+					$imgfile=$time.$ext;
+					copy("data/$filename","petit/src/{$imgfile}");
+					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
+				}
+				$pch_fname=pathinfo($pch,PATHINFO_FILENAME);
+				
+				$pchext=check_pch_ext($bbsnote_log_dir.$pch_fname);
+				if($pchext && is_file($bbsnote_log_dir.$pch)){//動画
+					copy($bbsnote_log_dir.$pch,"petit/src/$time.$pchext");
+					chmod("petit/src/$time.$pchext",PERMISSION_FOR_DEST);
+					$pchext=$_pchext;
+				}
+
+				$tool='';
+					
+				switch($pchext){
+					case '.pch':
+						$tool='neo';
+						break;
+					case '.spch':
+						$tool='shi-Painter';
+						break;
+					default:
+						if($ext){
+							$tool='???';
+						}
+						break;
+				}
+				$thumbnail='';
+				if($usethumb&&$is_img&&($thumbnail_size=thumb("petit/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
+					$W=$thumbnail_size['w'];
+					$H=$thumbnail_size['h'];
+					$thumbnail='thumbnail';
+				}
+
+				$url = str_replace([" ","　","\t"],'',$url);
+				if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
+					$url="";
+				}
+				$url=$url ? $http.$url :'';
+				$sub = $sub ? $sub : $defalt_subject;
+				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
+				$com=strip_tags($com);
+
+				$oya = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
+				$oya_arr[]=$oya;
+				$thread[$i][]=$oya;
+
+
+				$resub=$sub ? "Re: {$sub}" :'';
+
+			}else{//スレッドの子
+				unset($threadno,$_no,$now,$name,$sub,$email,$url,$com,$time,$ip,$host,$agent,$filename,$W,$painttime,$thumbnail,$pch,$applet);
+				$W=$H=$pch=$ptime=$ext=$time=$ip='';
+				if($relm){//relm
+					list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host)
+					=explode("<>",$val);
+				}else{//BBSNote
+					list($_no,$name,$now,$com,,$host,$email,$url)
+					=explode("\t",$val);
+					$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
+					$time=(int)strtotime($time);//strからUNIXタイムスタンプ
+				}
+
+				$time=$time ? $time*1000 : 0; 
+				$url = str_replace([" ","　","\t"],'',$url);
+				if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
+					$url="";
+				}
+				$url=$url ? $http.$url :'';
+				$thumbnail='';
+				$painttime='';
+				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
+				$com=strip_tags($com);
+
+				$res = "$no\t$resub\t$name\t\t$com\t$url\t\t\t\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\tres\n";
+				$thread[$i][]=$res;
+
 			}
-
-			$time=$time ? $time*1000 : 0; 
-			$url = str_replace([" ","　","\t"],'',$url);
-			if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
-				$url="";
-			}
-			$url=$url ? $http.$url :'';
-			$thumbnail='';
-			$painttime='';
-			$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
-			$com=strip_tags($com);
-
-			$res = "$no\t$resub\t$name\t\t$com\t$url\t\t\t\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\tres\n";
-			$thread[$i][]=$res;
-
+			file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
 
 		}
-		file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
-
-
 	}
-}
 
 $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
