@@ -61,6 +61,9 @@ $max_h=800;//この高さを超えたらサムネイル
 //もしもサーバ負荷の懸念がある場合は、「サムネイルを作成しない」にしたほうが無難です。
 
 define('THUMB_Q', 92);//サムネイルのjpg劣化率
+//問題がなければこのまま
+define('RE_SAMPLED', 1);
+
 
 /* ----------------- url設定 ----------------- */
 
@@ -442,11 +445,11 @@ function thumb($path,$tim,$ext,$max_w,$max_h){
 	// コピー＆縮小
 	if($nottrue) ImageCopyResized($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $size[0], $size[1]);
 	// サムネイル画像を保存
-	ImageJPEG($im_out, 'thumbnail/'.$tim.'s.jpg',THUMB_Q);
+	ImageJPEG($im_out, 'petit/thumbnail/'.$tim.'s.jpg',THUMB_Q);
 	// 作成したイメージを破棄
 	ImageDestroy($im_in);
 	ImageDestroy($im_out);
-	if(!chmod('thumbnail/'.$tim.'s.jpg',PERMISSION_FOR_DEST)){
+	if(!chmod('petit/thumbnail/'.$tim.'s.jpg',PERMISSION_FOR_DEST)){
 		return;
 	}
 
