@@ -1,4 +1,4 @@
-#ログコンバータ
+# ログコンバータ
 ## BBSNoteのログファイルをPetitNote形式に変換するログコンバータです。
 
 - ダウンロードは、[お絵かき掲示板 Petit Note のプラグイン](https://github.com/satopian/PetitNote_plugin)のページの緑のダウンロードボタンから。  
