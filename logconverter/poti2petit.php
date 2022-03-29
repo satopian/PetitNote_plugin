@@ -79,8 +79,10 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				$date=substr($date,0,21);
 				$date= preg_replace('/\(.+\)/', '', $date);//曜日除去
 				$time= $date_to_timestamp ? strtotime($date).'000': substr($_time,-13);
+				$imgfile='';
 				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
-					copy(IMG_DIR.$_time.$ext,"petit/src/{$time}{$ext}");
+					$imgfile=$time.$ext;
+					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
 					chmod("petit/src/{$time}{$ext}",0606);
 				}
 				$thumbnail='';
@@ -97,8 +99,6 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 					chmod("petit/src/{$time}{$pchext}",0606);
 				}
 	
-				$imgfile=$ext ? $time.$ext:'';
-
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
 
