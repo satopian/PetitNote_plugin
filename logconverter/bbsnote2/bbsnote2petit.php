@@ -156,7 +156,7 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 				$no=$i+1;
 				if($k===0){//スレッドの親
 				if($relm){//relm
-				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$ptime,)
+				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$painttime,)
 					=explode("<>",$val);
 				}else{//BBSNote
 				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,$painttime,$applet,$_thumbnail)
@@ -173,6 +173,7 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 				$_pchext =  (in_array($_pchext, ['pch', 'spch'])) ? $_pchext : '';
 				$is_img=false;
 				//POTI-board形式のファイル名に変更してコピー
+				$imgfile='';
 				if($ext && is_file("data/$filename")){//画像
 					if($save_at_synonym && is_file("petit/src/{$time}{$ext}")){
 							$time=$time+1;
@@ -232,7 +233,7 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 
 			}else{//スレッドの子
 				unset($threadno,$_no,$now,$name,$sub,$email,$url,$com,$time,$ip,$host,$agent,$filename,$W,$painttime,$thumbnail,$pch,$applet);
-				$W=$H=$pch=$ptime=$ext=$time=$ip='';
+				$W=$H=$pch=$painttime=$ext=$time=$ip='';
 				if($relm){//relm
 					list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host)
 					=explode("<>",$val);
