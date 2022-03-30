@@ -111,8 +111,9 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 	}
 	
 
-	$oya=[];
-	foreach($logfiles_arr as $logfile){//ログファイルを一つずつ開いて読み込む
+	$arr_logs=[];
+	foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開いて読み込む
+
 		$fp=fopen($logfile,"r");
 		while($line =fgets($fp)){
 			$line=mb_convert_encoding($line, "UTF-8", "sjis");
@@ -137,20 +138,27 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 					$no=$arr_line[0];
 				}
 			}
-			$logs[$no][]=$line;//1スレッド分
+			$arr_logs[$no][$i][]=$line;//1スレッド分
 		}
 		fclose($fp);
 	
 	}
-	// var_dump($log);
 
-	ksort($logs);
-	$logs=array_values($logs);
+	ksort($arr_logs);
+	$arr_logs=array_values($arr_logs);
+	foreach($arr_logs as $vals){
+		foreach($vals as $i=>$val){
+			$logs[$i]=$val;
+		}
+	}
 	$oya_arr=[];
 	$thread=[];
 
 	foreach($logs as $i=> $log){
 	
+		$pchext='';
+		$tool='';
+		$resub='';
 		foreach($log as $k=>$val){//1スレッド分のログを処理
 			// var_dump($val);
 				$no=$i+1;
