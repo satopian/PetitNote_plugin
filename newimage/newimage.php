@@ -21,7 +21,6 @@ $arr=[];
 	$fp=fopen('./log/'."alllog.log","r");
 	while ($log = fgets($fp)) {
 
-
 		list($resno)=explode("\t",$log);
 		if(is_file('./log/'."{$resno}.log")){
 		$cp=fopen('./log/'."{$resno}.log","r");
@@ -37,10 +36,10 @@ $arr=[];
 					}
 				}
 			}
-			++$i;
-			if($i>=3){break;}
 			fclose($cp);	
 		}
+		++$i;
+		if($i>=3){break;}
 	}
 	fclose($fp);
 
