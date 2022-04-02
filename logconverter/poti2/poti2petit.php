@@ -41,16 +41,16 @@ if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 
 	$trees=array_reverse($trees, false);
 	if (!is_dir('petit')){
-		mkdir('petit', 0606);
+		mkdir('petit', 0705);
 	}
 	if (!is_dir('petit/log')){
-		mkdir('petit/log', 0606);
+		mkdir('petit/log', 0707);
 	}
 	if (!is_dir('petit/src')){
-		mkdir('petit/src', 0606);
+		mkdir('petit/src', 0707);
 	}
 	if (!is_dir('petit/thumbnail')){
-		mkdir('petit/thumbnail', 0606);
+		mkdir('petit/thumbnail', 0707);
 	}
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
@@ -139,10 +139,14 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				}
 			}
 				file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
+				chmod('petit/log/'.$no.'.log',0600);	
+
 }
 
 $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
+chmod('petit/log/alllog.log',0600);	
+
 
 echo'変換終了。リロードしないでください。';
 
