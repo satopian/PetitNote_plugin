@@ -5,6 +5,19 @@
 
 //設定項目
 
+/* -------------- パーミッション -------------- */
+
+//正常に動作しているときは変更しない。
+//画像やHTMLファイルのパーミッション。
+define('PERMISSION_FOR_DEST', 0606);//初期値 PERMISSION_FOR_DEST
+//ブラウザから直接呼び出さないログファイルのパーミッション
+define('PERMISSION_FOR_LOG', 0600);//初期値 PERMISSION_FOR_LOG
+//POTIディレクトリのパーミッション
+define('PERMISSION_FOR_PETIT', 0705);//初期値 PERMISSION_FOR_PETIT
+//画像や動画ファイルを保存するディレクトリのパーミッション
+define('PERMISSION_FOR_DIR', 0707);//初期値 PERMISSION_FOR_DIR
+
+/* -------------- 日付の計算 -------------- */
 // 2022/02/25 のような日付から投稿時刻を計算するかどうか?
 //する: true 
 //しない: false 
@@ -41,16 +54,16 @@ if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 
 	$trees=array_reverse($trees, false);
 	if (!is_dir('petit')){
-		mkdir('petit', 0705);
+		mkdir('petit', PERMISSION_FOR_PETIT);
 	}
 	if (!is_dir('petit/log')){
-		mkdir('petit/log', 0707);
+		mkdir('petit/log', PERMISSION_FOR_DIR);
 	}
 	if (!is_dir('petit/src')){
-		mkdir('petit/src', 0707);
+		mkdir('petit/src', PERMISSION_FOR_DIR);
 	}
 	if (!is_dir('petit/thumbnail')){
-		mkdir('petit/thumbnail', 0707);
+		mkdir('petit/thumbnail', PERMISSION_FOR_DIR);
 	}
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
@@ -83,20 +96,20 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
 					$imgfile=$time.$ext;
 					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
-					chmod("petit/src/{$time}{$ext}",0606);
+					chmod("petit/src/{$time}{$ext}",PERMISSION_FOR_DEST);
 				}
 				$thumbnail='';
 				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
 					$thumbnail='thumbnail';
 					copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
-					chmod("petit/thumbnail/{$time}s.jpg",0606);
+					chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
 				}
 				
 				$pchext=check_pch_ext (PCH_DIR.$_time);
 				
 				if($pchext){//動画
 					copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
-					chmod("petit/src/{$time}{$pchext}",0606);
+					chmod("petit/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 				}
 	
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
@@ -139,13 +152,13 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				}
 			}
 				file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
-				chmod('petit/log/'.$no.'.log',0600);	
+				chmod('petit/log/'.$no.'.log',PERMISSION_FOR_LOG);	
 
 }
 
 $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
-chmod('petit/log/alllog.log',0600);	
+chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
 
 echo'変換終了。リロードしないでください。';
