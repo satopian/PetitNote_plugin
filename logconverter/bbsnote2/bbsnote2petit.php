@@ -82,7 +82,7 @@ define('PERMISSION_FOR_DEST', 0606);//初期値 0606
 //ブラウザから直接呼び出さないログファイルのパーミッション
 define('PERMISSION_FOR_LOG', 0600);//初期値 0600
 //POTIディレクトリのパーミッション
-define('PERMISSION_FOR_POTI', 0705);//初期値 0705
+define('PERMISSION_FOR_PETIT', 0705);//初期値 PERMISSION_FOR_PETIT
 //画像や動画ファイルを保存するディレクトリのパーミッション
 define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 
@@ -93,16 +93,16 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 //ここから下には設定項目はありません。
 
 	if (!is_dir('petit')){
-		mkdir('petit', 0705);
+		mkdir('petit', PERMISSION_FOR_PETIT);
 	}
 	if (!is_dir('petit/log')){
-		mkdir('petit/log', 0707);
+		mkdir('petit/log', PERMISSION_FOR_DIR);
 	}
 	if (!is_dir('petit/src')){
-		mkdir('petit/src', 0707);
+		mkdir('petit/src', PERMISSION_FOR_DIR);
 	}
 	if (!is_dir('petit/thumbnail')){
-		mkdir('petit/thumbnail', 0707);
+		mkdir('petit/thumbnail', PERMISSION_FOR_DIR);
 	}
 	$logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_exe.'}', GLOB_BRACE));//ログファイルをglob
 	if(!$logfiles_arr){
@@ -267,14 +267,14 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 
 			}
 			file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
-			chmod('petit/log/'.$no.'.log',0600);	
+			chmod('petit/log/'.$no.'.log',PERMISSION_FOR_LOG);	
 
 		}
 	}
 
 $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
-chmod('petit/log/alllog.log',0600);	
+chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
 echo'変換終了。リロードしないでください。';
 
