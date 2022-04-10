@@ -153,8 +153,8 @@ $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
-$msg_dane = lang_en() ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
-echo $msg_dane;
+echo lang_en() ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
+;
 
 function lang_en(){//言語が日本語以外ならtrue。
 	$lang = ($http_langs = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '')
