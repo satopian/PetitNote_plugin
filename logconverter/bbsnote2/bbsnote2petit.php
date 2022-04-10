@@ -98,10 +98,12 @@ check_dir('petit/log');
 check_dir('petit/src');
 check_dir('petit/thumbnail');
 
+$en=lang_en();
+
 $logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_exe.'}', GLOB_BRACE));//ログファイルをglob
 
 if(!$logfiles_arr){
-		error('BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
+		error($en?'Failed to read the BBS Note log file. The setting of the log file heading character is incosect.':'BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
 	}
 	
 	$arr_logs=[];
@@ -116,7 +118,7 @@ if(!$logfiles_arr){
 				$arr_line=explode("<>",$line);
 				$count_arr_line=count($arr_line);
 				if($count_arr_line<5){
-					error('ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
+					error($en?'Failed to read the log file. The settings may be incorrect.':'ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
 				}
 				if($count_arr_line>20){//スレッドの親?
 					$no=$arr_line[1];
@@ -125,7 +127,7 @@ if(!$logfiles_arr){
 				$arr_line=explode("\t",$line);
 				$count_arr_line=count($arr_line);
 				if($count_arr_line<5){
-					error('ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
+					error($en?'Failed to read the log file. The settings may be incorrect.':'ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
 				}
 				if($count_arr_line>11){//スレッドの親?
 					$no=$arr_line[0];
@@ -270,7 +272,8 @@ $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
-echo'変換終了。リロードしないでください。';
+echo $en ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
+;
 
 function lang_en(){//言語が日本語以外ならtrue。
 	$lang = ($http_langs = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '')
@@ -278,51 +281,10 @@ function lang_en(){//言語が日本語以外ならtrue。
   return (stripos($lang,'ja')!==0) ? true : false;
   
 }
-function initial_error_message(){
-	$en=lang_en();
-	$msg['001']=$en ? ' does not exist.':'がありません。'; 
-	$msg['002']=$en ? ' is not readable.':'を読めません。'; 
-	$msg['003']=$en ? ' is not writable.':'を書けません。'; 
-return $msg;	
-}
-
-// ファイル存在チェック
-function check_file ($path,$check_writable='') {
-	$msg=initial_error_message();
-	if (!is_file($path)) return $path . $msg['001']."<br>";
-	if (!is_readable($path)) return $path . $msg['002']."<br>";
-	if($check_writable){//書き込みが必要なファイルのチェック
-		if (!is_writable($path)) return $path . $msg['003']."<br>";
-	}
-}
 
 //タブ除去
 function t($str){
 	return str_replace("\t","",$str);
-}
-
-/**
- * 名前とトリップを分離
- * @param $name
- * @return array
- */
-function separateNameAndTrip ($name) {
-	$name=strip_tags($name);//タグ除去
-	if(preg_match("/(◆.*)/", $name, $regs)){
-		return [preg_replace("/(◆.*)/","",$name), $regs[1]];
-	}
-	return [$name, ''];
-}
-/**
- * 日付とIDを分離
- * @param $date
- * @return array
- */
-function separateDatetimeAndId ($date) {
-	if (preg_match("/( ID:)(.*)/", $date, $regs)){
-		return [$regs[2], preg_replace("/( ID:.*)/","",$date)];
-	}
-	return ['', $date];
 }
 
 /**
