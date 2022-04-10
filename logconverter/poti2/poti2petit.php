@@ -2,20 +2,9 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 //Licence MIT
+//lot.220410
 
-//設定項目
-
-/* -------------- パーミッション -------------- */
-
-//正常に動作しているときは変更しない。
-//画像やHTMLファイルのパーミッション。
-define('PERMISSION_FOR_DEST', 0606);//初期値 PERMISSION_FOR_DEST
-//ブラウザから直接呼び出さないログファイルのパーミッション
-define('PERMISSION_FOR_LOG', 0600);//初期値 PERMISSION_FOR_LOG
-//POTIディレクトリのパーミッション
-define('PERMISSION_FOR_PETIT', 0705);//初期値 PERMISSION_FOR_PETIT
-//画像や動画ファイルを保存するディレクトリのパーミッション
-define('PERMISSION_FOR_DIR', 0707);//初期値 PERMISSION_FOR_DIR
+/* ------------- 設定項目ここから ------------- */
 
 /* -------------- 日付の計算 -------------- */
 // 2022/02/25 のような日付から投稿時刻を計算するかどうか?
@@ -32,40 +21,42 @@ $date_to_timestamp=false;
 // $date_to_timestamp=true; 
 
 //設定項目ここまで
-//ここから下には設定項目はありません。
 
 //設定ファイルの読み込み
 if ($err = check_file(__DIR__.'/config.php')) {
-	echo $err;
-	exit;
+	die($err);
 }
 require(__DIR__.'/config.php');
+
+/* -------------- パーミッション -------------- */
+
+//正常に動作しているときは変更しない。
+//画像やHTMLファイルのパーミッション。
+defined('PERMISSION_FOR_DEST') or define('PERMISSION_FOR_DEST', 0606);
+//ブラウザから直接呼び出さないログファイルのパーミッション
+defined('PERMISSION_FOR_LOG') or define('PERMISSION_FOR_LOG', 0600);
+//POTIディレクトリのパーミッション
+define('PERMISSION_FOR_PETIT', 0705);//初期値 PERMISSION_FOR_PETIT
+//画像や動画ファイルを保存するディレクトリのパーミッション
+defined('PERMISSION_FOR_DIR') or define('PERMISSION_FOR_DIR', 0707);
+
 if ($err = check_file(__DIR__.'/'.LOGFILE)) {
-	echo $err;
-	exit;
+	die($err);
 }
 if ($err = check_file(__DIR__.'/'.TREEFILE)) {
-	echo $err;
-	exit;
+	die($err);
 }
 
-	$trees = file(TREEFILE);
-	$line = file(LOGFILE);
+$trees = file(TREEFILE);
+$line = file(LOGFILE);
 
-	$trees=array_reverse($trees, false);
-	if (!is_dir('petit')){
-		mkdir('petit', PERMISSION_FOR_PETIT);
-	}
-	if (!is_dir('petit/log')){
-		mkdir('petit/log', PERMISSION_FOR_DIR);
-	}
-	if (!is_dir('petit/src')){
-		mkdir('petit/src', PERMISSION_FOR_DIR);
-	}
-	if (!is_dir('petit/thumbnail')){
-		mkdir('petit/thumbnail', PERMISSION_FOR_DIR);
-	}
+$trees=array_reverse($trees, false);
 
+check_petit('petit');
+check_dir('petit/log');
+check_dir('petit/src');
+check_dir('petit/thumbnail');
+	
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
 foreach($trees as $i=>$tree){//ツリーの読み込み
 			$treeline = explode(",", rtrim($tree));
@@ -96,7 +87,7 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
 					$imgfile=$time.$ext;
 					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
-					chmod("petit/src/{$time}{$ext}",PERMISSION_FOR_DEST);
+					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
 				}
 				$thumbnail='';
 				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
@@ -137,6 +128,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 						break;
 				}
 
+				$url=(strlen($url) < 200) ? $url :'';
+
 				if($k===0){//スレッドの親の時
 
 					$oya = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
@@ -160,8 +153,8 @@ $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
-
-echo'変換終了。リロードしないでください。';
+$msg_dane = $en ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
+echo $msg_dane;
 
 function lang_en(){//言語が日本語以外ならtrue。
 	$lang = ($http_langs = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '')
@@ -175,6 +168,21 @@ function initial_error_message(){
 	$msg['002']=$en ? ' is not readable.':'を読めません。'; 
 	$msg['003']=$en ? ' is not writable.':'を書けません。'; 
 return $msg;	
+}
+
+function check_dir ($path) {
+
+	if (!is_dir($path)) {
+			mkdir($path, PERMISSION_FOR_DIR,true);
+			chmod($path, PERMISSION_FOR_DIR);
+	}
+}
+function check_petit ($path) {
+
+	if (!is_dir($path)) {
+			mkdir($path, PERMISSION_FOR_PETIT,true);
+			chmod($path, PERMISSION_FOR_PETIT);
+	}
 }
 
 // ファイル存在チェック

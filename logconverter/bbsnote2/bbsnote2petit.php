@@ -2,7 +2,8 @@
 
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
-//Licence MIT
+// Licence MIT
+// lot.22410 
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -92,24 +93,17 @@ define('PERMISSION_FOR_DIR', 0707);//初期値 0707
 //設定項目ここまで
 //ここから下には設定項目はありません。
 
-	if (!is_dir('petit')){
-		mkdir('petit', PERMISSION_FOR_PETIT);
-	}
-	if (!is_dir('petit/log')){
-		mkdir('petit/log', PERMISSION_FOR_DIR);
-	}
-	if (!is_dir('petit/src')){
-		mkdir('petit/src', PERMISSION_FOR_DIR);
-	}
-	if (!is_dir('petit/thumbnail')){
-		mkdir('petit/thumbnail', PERMISSION_FOR_DIR);
-	}
-	$logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_exe.'}', GLOB_BRACE));//ログファイルをglob
-	if(!$logfiles_arr){
+check_petit('petit');
+check_dir('petit/log');
+check_dir('petit/src');
+check_dir('petit/thumbnail');
+
+$logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_exe.'}', GLOB_BRACE));//ログファイルをglob
+
+if(!$logfiles_arr){
 		error('BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
 	}
 	
-
 	$arr_logs=[];
 	foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開いて読み込む
 
@@ -351,6 +345,22 @@ function is_neo($src) {//neoのPCHかどうか調べる
 	fclose($fp);
 	return $is_neo;
 }
+
+function check_dir ($path) {
+
+	if (!is_dir($path)) {
+			mkdir($path, PERMISSION_FOR_DIR,true);
+			chmod($path, PERMISSION_FOR_DIR);
+	}
+}
+function check_petit ($path) {
+
+	if (!is_dir($path)) {
+			mkdir($path, PERMISSION_FOR_PETIT,true);
+			chmod($path, PERMISSION_FOR_PETIT);
+	}
+}
+
 //GD版が使えるかチェック
 function gd_check(){
 	$check = array("ImageCreate","ImageCopyResized","ImageCreateFromJPEG","ImageJPEG","ImageDestroy");
@@ -440,7 +450,11 @@ function thumb($path,$tim,$ext,$max_w,$max_h){
 	$nottrue = 0;
 	if(function_exists("ImageCreateTrueColor")&&get_gd_ver()=="2"){
 		$im_out = ImageCreateTrueColor($out_w, $out_h);
-		// コピー＆再サンプリング＆縮小
+		if(function_exists("ImageColorAlLocate") && function_exists("imagefill")){
+			$background = ImageColorAlLocate($im_out, 0xFF, 0xFF, 0xFF);//背景色を白に
+			imagefill($im_out, 0, 0, $background);
+		}
+	// コピー＆再サンプリング＆縮小
 		if(function_exists("ImageCopyResampled")&&RE_SAMPLED){
 			ImageCopyResampled($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $size[0], $size[1]);
 		}else{$nottrue = 1;}
