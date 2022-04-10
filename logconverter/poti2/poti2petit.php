@@ -41,17 +41,17 @@ define('PERMISSION_FOR_PETIT', 0705);//初期値 PERMISSION_FOR_PETIT
 defined('PERMISSION_FOR_DIR') or define('PERMISSION_FOR_DIR', 0707);
 
 if ($err = check_file(__DIR__.'/'.LOGFILE)) {
-	die($err);
+	die(h($err));
 }
 if ($err = check_file(__DIR__.'/'.TREEFILE)) {
-	die($err);
+	die(h($err));
 }
 
 $trees = file(TREEFILE);
 $line = file(LOGFILE);
 
 $trees=array_reverse($trees, false);
-
+//ディレクトリを確認して無ければ作る
 check_petit('petit');
 check_dir('petit/log');
 check_dir('petit/src');
@@ -153,7 +153,7 @@ $oya_arr=array_reverse($oya_arr, false);
 file_put_contents('petit/log/alllog.log',$oya_arr);
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
-$msg_dane = $en ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
+$msg_dane = lang_en() ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
 echo $msg_dane;
 
 function lang_en(){//言語が日本語以外ならtrue。
@@ -188,10 +188,10 @@ function check_petit ($path) {
 // ファイル存在チェック
 function check_file ($path,$check_writable='') {
 	$msg=initial_error_message();
-	if (!is_file($path)) return $path . $msg['001']."<br>";
-	if (!is_readable($path)) return $path . $msg['002']."<br>";
+	if (!is_file($path)) return $path . $msg['001'];
+	if (!is_readable($path)) return $path . $msg['002'];
 	if($check_writable){//書き込みが必要なファイルのチェック
-		if (!is_writable($path)) return $path . $msg['003']."<br>";
+		if (!is_writable($path)) return $path . $msg['003'];
 	}
 }
 //逆変換テーブル作成
@@ -212,6 +212,11 @@ function get_lineindex ($line){
 //タブ除去
 function t($str){
 	return str_replace("\t","",$str);
+}
+
+//エスケープ
+function h($str){
+	return htmlspecialchars($str,ENT_QUOTES,"utf-8",false);
 }
 
 /**
