@@ -2,7 +2,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 //Licence MIT
-//lot.220410
+//lot.220507
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -198,13 +198,14 @@ function check_file ($path,$check_writable='') {
 function get_lineindex ($line){
 	$lineindex = [];
 	foreach($line as $i =>$value){
-		if($value !==''){
+		if(!trim($value)){
+			continue;
+		}
 			list($no,) = explode(",", $value);
 			if(!is_numeric($no)){//記事Noが正しく読み込まれたかどうかチェック
 				// error(MSG019);
 			};
 			$lineindex[$no] = $i; // 値にkey keyに記事no
-		}
 	}
 	return $lineindex;
 }

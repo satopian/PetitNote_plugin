@@ -3,7 +3,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 // Licence MIT
-// lot.22410 
+// lot.220507
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -111,6 +111,9 @@ if(!$logfiles_arr){
 
 		$fp=fopen($logfile,"r");
 		while($line =fgets($fp)){
+			if(!trim($line)){
+				continue;
+			}
 			$line=mb_convert_encoding($line, "UTF-8", "sjis");
 			$line = str_replace(",", "&#44;", $line);
 			if($relm){//relm
