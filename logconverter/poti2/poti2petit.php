@@ -61,8 +61,8 @@ while($_tree = fgets($tp)){
 	}
 	$trees[]=$_tree;
 }
-closeFile($tp);
-closeFile($fp);
+fclose($tp);
+fclose($fp);
 
 $trees=array_reverse($trees, false);
 //ディレクトリを確認して無ければ作る
