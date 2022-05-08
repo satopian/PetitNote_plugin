@@ -2,7 +2,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 //Licence MIT
-//lot.220507
+//lot.220508
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -47,8 +47,22 @@ if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 	die(h($err));
 }
 
-$trees = file(TREEFILE);
-$line = file(LOGFILE);
+$fp=fopen(LOGFILE,"r");
+while($_line = fgets($fp)){
+	if(!trim($_line)){
+		continue;
+	}
+	$line[]=$_line;
+}
+$tp=fopen(TREEFILE,"r");
+while($_tree = fgets($tp)){
+	if(!trim($_tree)){
+		continue;
+	}
+	$trees[]=$_tree;
+}
+closeFile($tp);
+closeFile($fp);
 
 $trees=array_reverse($trees, false);
 //ディレクトリを確認して無ければ作る
