@@ -21,4 +21,4 @@ $logfiles_arr =(glob('./log/*.log', GLOB_BRACE));//ログファイルをglob
 	krsort($logs);
 	$logs=array_values($logs);
 file_put_contents('./log/new_alllog.log',$logs);
-echo '再構築が完了しました。<br>new_alllog.logという仮のファイル名で再構築したログファイルを出力しました。';
+echo '再構築が完了しました。<br>new_alllog.logに再構築したログファイルを出力しました。';
