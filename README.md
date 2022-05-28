@@ -9,4 +9,4 @@
 - [PetitNoteの新着画像を表示するPHP](https://github.com/satopian/PetitNote_plugin/tree/main/newimage)
 
 ## ログ修復ツール
-- [PetitNote 全体ログ修復ツール](https://github.com/satopian/PetitNote_plugin/tree/main/recoverlog)
+- [全体ログ修復ツール](https://github.com/satopian/PetitNote_plugin/tree/main/recoverlog)
