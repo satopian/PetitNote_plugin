@@ -21,4 +21,6 @@ $logfiles_arr =(glob('./log/*.log', GLOB_BRACE));//ログファイルをglob
 	krsort($logs);
 	$logs=array_values($logs);
 file_put_contents('./log/new_alllog.log',$logs);
+chmod('./log/new_alllog.log',0600);	
+
 echo '再構築が完了しました。<br>new_alllog.logに再構築したログファイルを出力しました。';
