@@ -14,7 +14,7 @@
 - ダウンロードは、[お絵かき掲示板 Petit Note のプラグイン](https://github.com/satopian/PetitNote_plugin)のページの緑の｢Code｣ボタンから。  
 - `index.php`と同じディレクトリに配置します。
 - `recoverlog.php`をブラウザで呼び出します。
-- `nwe_alllog.log`というファイルに全体ログが出力されます。
+- `new_alllog.log`というファイルに新しく作り直された全体ログが出力されます。
 
 ### 生成されたログファイルのファイル名を変更
 
