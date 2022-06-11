@@ -49,9 +49,13 @@ if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 
 $fp=fopen(LOGFILE,"r");
 while($_line = fgets($fp)){
+	
 	if(!trim($_line)){
 		continue;
 	}
+	mb_language('Japanese');
+	$_line=mb_convert_encoding($_line, "UTF-8", "auto");
+
 	$line[]=$_line;
 }
 $tp=fopen(TREEFILE,"r");
@@ -85,8 +89,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 
 				// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
 				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,)
-				=explode(",",rtrim(t($line[$j])));
-
+				=explode(",",rtrim(t($line[$j])).',,,');
+				
 
 				$painttime=is_numeric($_ptime) ? $_ptime :''; 
 				//名前とトリップを分離
