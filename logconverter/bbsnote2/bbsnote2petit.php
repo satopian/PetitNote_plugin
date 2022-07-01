@@ -22,8 +22,8 @@ $bbsnote_filehead_logs = 'LOG';//v8は'LOG'
 
 //BBSNoteのログファイルの拡張子
 
-// $bbsnote_log_exe = 'log';//v7は、'log'
-$bbsnote_log_exe = 'cgi';//v8は'cgi'
+// $bbsnote_log_ext = 'log';//v7は、'log'
+$bbsnote_log_ext = 'cgi';//v8は'cgi'
 
 /* --------------- relmから変換 --------------- */
 
@@ -100,7 +100,7 @@ check_dir('petit/thumbnail');
 
 $en=lang_en();
 
-$logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_exe.'}', GLOB_BRACE));//ログファイルをglob
+$logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_ext.'}', GLOB_BRACE));//ログファイルをglob
 
 if(!$logfiles_arr){
 		error($en?'Failed to read the BBS Note log file. The setting of the log file heading character is incosect.':'BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
@@ -115,7 +115,6 @@ if(!$logfiles_arr){
 				continue;
 			}
 			$line=mb_convert_encoding($line, "UTF-8", "sjis");
-			$line = str_replace(",", "&#44;", $line);
 			if($relm){//relm
 				$line = t($line);
 				$arr_line=explode("<>",$line);
