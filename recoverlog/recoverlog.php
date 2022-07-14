@@ -7,7 +7,7 @@ $logfiles_arr =(glob('./log/*.log', GLOB_BRACE));//ログファイルをglob
 	$logs=[];
 	foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開いて読み込む
 	if(strpos($logfile,'alllog')===false){
-		$fp=fopen($logfile,"r+");
+		$fp=fopen($logfile,"r");
 		$line =fgets($fp);
 		if(trim($line)){
 			list($r_no,$oyasub,$n_,$v_,$c_,$u_,$img_,$_,$_,$thumb_,$pt_,$md5_,$to_,$pch_,$postedtime,$fp_time_,$h_,$uid_,$h_,$r_oya)=explode("\t",trim($line));
