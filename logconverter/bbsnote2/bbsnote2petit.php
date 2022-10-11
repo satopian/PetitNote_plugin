@@ -3,7 +3,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 // Licence MIT
-// lot.220507
+// lot.221011
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -164,7 +164,8 @@ if(!$logfiles_arr){
 				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$painttime,)
 					=explode("<>",$val);
 				}else{//BBSNote
-				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,$painttime,$applet,$_thumbnail)
+				$painttime='';
+				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,,$applet,$_thumbnail)
 					=explode("\t",$val);
 				$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
 				$time=(int)strtotime($time);//strからUNIXタイムスタンプ
@@ -177,7 +178,7 @@ if(!$logfiles_arr){
 				$ext = (!in_array($ext, ['.pch', '.spch'])) ? $ext : ''; 
 				$_pchext =  (in_array($_pchext, ['pch', 'spch'])) ? $_pchext : '';
 				$is_img=false;
-				//POTI-board形式のファイル名に変更してコピー
+				//Petit Note形式のファイル名に変更してコピー
 				$imgfile='';
 				if($ext && is_file("data/$filename")){//画像
 					if($save_at_synonym && is_file("petit/src/{$time}{$ext}")){
@@ -191,11 +192,10 @@ if(!$logfiles_arr){
 				}
 				$pch_fname=pathinfo($pch,PATHINFO_FILENAME);
 				
-				$pchext=check_pch_ext($bbsnote_log_dir.$pch_fname);
+				$pchext=$_pchext ? check_pch_ext($bbsnote_log_dir.$pch_fname):'';
 				if($pchext && is_file($bbsnote_log_dir.$pch)){//動画
-					copy($bbsnote_log_dir.$pch,"petit/src/$time.$pchext");
-					chmod("petit/src/$time.$pchext",PERMISSION_FOR_DEST);
-					$pchext=$_pchext;
+					copy($bbsnote_log_dir.$pch,"petit/src/{$time}{$pchext}");
+					chmod("petit/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 				}
 
 				$tool='';
@@ -214,6 +214,7 @@ if(!$logfiles_arr){
 						break;
 				}
 				$thumbnail='';
+				
 				if($usethumb&&$is_img&&($thumbnail_size=thumb("petit/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
 					$W=$thumbnail_size['w'];
 					$H=$thumbnail_size['h'];
@@ -229,9 +230,10 @@ if(!$logfiles_arr){
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
 
-				$oya = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
-				$oya_arr[]=$oya;
-				$thread[$i][]=$oya;
+				$thread[$i][] = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
+
+				$strcut_com=mb_strcut($com,0,120);
+				$oya_arr[] = "$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
 
 
 				$resub=$sub ? "Re: {$sub}" :'';
