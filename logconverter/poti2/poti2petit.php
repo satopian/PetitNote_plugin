@@ -2,7 +2,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 //Licence MIT
-//lot.220508
+//lot.221011
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -147,13 +147,15 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				}
 
 				$url=(strlen($url) < 200) ? $url :'';
-
+				$sub = $sub ? $sub : DEF_SUB; 
 				if($k===0){//スレッドの親の時
 
-					$oya = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
+					$thread[$i][]="$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
 
-					$thread[$i][]=$oya;
-					$oya_arr[]=$oya;
+
+					$strcut_com=mb_strcut($com,0,120);
+					$oya_arr[]=	"$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
+
 				}else{
 				
 					$res = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\tres\n";
