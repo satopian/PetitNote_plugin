@@ -3,7 +3,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 // Licence MIT
-// lot.221011
+// lot.221016
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -105,7 +105,7 @@ $logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_l
 if(!$logfiles_arr){
 		error($en?'Failed to read the BBS Note log file. The setting of the log file heading character is incosect.':'BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
 	}
-	
+
 	$arr_logs=[];
 	foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開いて読み込む
 
@@ -148,11 +148,13 @@ if(!$logfiles_arr){
 			$logs[$i]=$val;
 		}
 	}
+	$logs=array_values($logs);
+
 	$oya_arr=[];
 	$thread=[];
 
 	foreach($logs as $i=> $log){
-	
+
 		$pchext='';
 		$tool='';
 		$resub='';

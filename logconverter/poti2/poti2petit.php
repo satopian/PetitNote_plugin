@@ -63,18 +63,19 @@ while($_tree = fgets($tp)){
 	if(!trim($_tree)){
 		continue;
 	}
-	$trees[]=$_tree;
+	list($_no,)=explode(",",$_tree);
+	$trees[$_no]=$_tree;
 }
 fclose($tp);
 fclose($fp);
-
-$trees=array_reverse($trees, false);
+ksort($trees);
+$trees=array_values($trees);
 //ディレクトリを確認して無ければ作る
 check_petit('petit');
 check_dir('petit/log');
 check_dir('petit/src');
 check_dir('petit/thumbnail');
-	
+
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
 foreach($trees as $i=>$tree){//ツリーの読み込み
 			$treeline = explode(",", rtrim($tree));
