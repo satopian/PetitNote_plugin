@@ -103,8 +103,12 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				$date= preg_replace('/\(.+\)/', '', $date);//曜日除去
 				$time= $date_to_timestamp ? strtotime($date).'000': substr($_time,-13);
 				$imgfile='';
+				$time=basename($time);
+				$_time=basename($_time);
+				$ext=basename($ext);
 				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
 					$imgfile=$time.$ext;
+					$imgfile=basename($imgfile);
 					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
 					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
 				}

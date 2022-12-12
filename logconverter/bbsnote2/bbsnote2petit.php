@@ -174,10 +174,12 @@ if(!$logfiles_arr){
 				}
 
 				$time=$time ? $time*1000 : 0; 
+				$time=basename($time);
 				$ext = $filename ? '.'.pathinfo($filename,PATHINFO_EXTENSION ) :'';
+				$filename = $filename ? basename($filename) : '';
 				$_pchext = pathinfo($pch,PATHINFO_EXTENSION );
 
-				$ext = (!in_array($ext, ['.pch', '.spch'])) ? $ext : ''; 
+				$ext = (!in_array($ext, ['.pch', '.spch'])) ? basename($ext) : ''; 
 				$_pchext =  (in_array($_pchext, ['pch', 'spch'])) ? $_pchext : '';
 				$is_img=false;
 				//Petit Note形式のファイル名に変更してコピー
