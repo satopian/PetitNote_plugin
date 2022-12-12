@@ -22,12 +22,14 @@ $arr=[];
 	while ($log = fgets($fp)) {
 
 		list($resno)=explode("\t",$log);
+		$resno=basename($resno);
 		if(is_file('./log/'."{$resno}.log")){
 		$cp=fopen('./log/'."{$resno}.log","r");
 			while($line=fgets($cp)){
 				
 				list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$line);
-
+				$imgfile=basename($imgfile);
+				$time=basename($time);
 				if ($imgfile){
 					if($thumbnail){
 						$arr[$time]='thumbnail/'.$time.'s.jpg';
@@ -71,5 +73,4 @@ switch ($img_type):
 	endswitch;
 		
 readfile($filename);
-
 
