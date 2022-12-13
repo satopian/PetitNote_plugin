@@ -4,8 +4,9 @@
 // Licence MIT
 //---------------- 設定 ----------------
 
-// 画像がない時に表示する画像を指定
-$default='';
+// デフォルト画像。
+// 画像がない時または閲覧注意画像の時に代わりに表示する画像を指定。
+$default='./thumbnail/ogimage.png';
 //例
 // $default='https://example.com/bbs/image.png';
 //設定しないなら初期値の
@@ -31,7 +32,9 @@ $arr=[];
 				$imgfile=basename($imgfile);
 				$time=basename($time);
 				if ($imgfile){
-					if($thumbnail){
+					if($thumbnail==='hide_thumbnail'||$thumbnail==='hide_'){
+						$arr[$time]=$default;
+					}elseif($thumbnail==='thumbnail'){
 						$arr[$time]='thumbnail/'.$time.'s.jpg';
 					}else{
 						$arr[$time]='src/'.$imgfile;
@@ -73,4 +76,3 @@ switch ($img_type):
 	endswitch;
 		
 readfile($filename);
-
