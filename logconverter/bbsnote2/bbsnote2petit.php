@@ -1,9 +1,9 @@
 <?php
 
 // POTI-board → Petit Note ログコンバータ。
-// (c)2022 さとぴあ(satopian) 
+// (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.221016
+// lot.230210
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -123,7 +123,7 @@ if(!$logfiles_arr){
 					error($en?'Failed to read the log file. The settings may be incorrect.':'ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
 				}
 				if($count_arr_line>20){//スレッドの親?
-					$no=$arr_line[1];
+					$no=(int)$arr_line[1];
 				}
 			}else{//BBSNote
 				$arr_line=explode("\t",$line);
@@ -132,7 +132,7 @@ if(!$logfiles_arr){
 					error($en?'Failed to read the log file. The settings may be incorrect.':'ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
 				}
 				if($count_arr_line>11){//スレッドの親?
-					$no=$arr_line[0];
+					$no=(int)$arr_line[0];
 				}
 			}
 			$arr_logs[$no][$i][]=$line;//1スレッド分
@@ -168,7 +168,7 @@ if(!$logfiles_arr){
 				}else{//BBSNote
 				$painttime='';
 				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,,$applet,$_thumbnail)
-					=explode("\t",$val);
+					=explode("\t",$val."\t");
 				$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
 				$time=(int)strtotime($time);//strからUNIXタイムスタンプ
 				}
@@ -223,6 +223,8 @@ if(!$logfiles_arr){
 					$W=$thumbnail_size['w'];
 					$H=$thumbnail_size['h'];
 					$thumbnail='thumbnail';
+				}else{
+					list($W,$H)=getimagesize("petit/src/{$imgfile}");
 				}
 
 				$url = str_replace([" ","　","\t"],'',$url);
@@ -233,7 +235,7 @@ if(!$logfiles_arr){
 				$sub = $sub ? $sub : $defalt_subject;
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
-
+				$no=(int)$no;
 				$thread[$i][] = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
 
 				$strcut_com=mb_strcut($com,0,120);
@@ -265,7 +267,7 @@ if(!$logfiles_arr){
 				$painttime='';
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
-
+				$no=(int)$no;
 				$res = "$no\t$resub\t$name\t\t$com\t$url\t\t\t\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\tres\n";
 				$thread[$i][]=$res;
 
