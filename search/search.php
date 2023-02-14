@@ -19,12 +19,11 @@ $skindir = 'template/'.$skindir;
 
 $imgsearch=(bool)filter_input(INPUT_GET,'imgsearch',FILTER_VALIDATE_BOOLEAN);
 $page=(int)filter_input(INPUT_GET,'page',FILTER_VALIDATE_INT);
-$query=(string)filter_input(INPUT_GET,'query');
-$query=urldecode($query);
-$query=mb_convert_kana($query, 'rn', 'UTF-8');
-$query=str_replace(array(" ", "　"), "", $query);
-$query=str_replace("〜","～",$query);//波ダッシュを全角チルダに
-$query=h($query);
+$q=(string)filter_input(INPUT_GET,'q');
+$q=urldecode($q);
+$q=mb_convert_kana($q, 'rn', 'UTF-8');
+$q=str_replace(array(" ", "　"), "", $q);
+$q=str_replace("〜","～",$q);//波ダッシュを全角チルダに
 $radio =filter_input(INPUT_GET,'radio',FILTER_VALIDATE_INT);
 
 if($imgsearch){
@@ -70,11 +69,11 @@ while ($log = fgets($fp)) {
 				}
 				
 				//ログとクエリを照合
-				if($query===''||//空白なら
-						$query!==''&&$radio===3&&stripos($s_com,$query)!==false||//本文を検索
-						$query!==''&&$radio===3&&stripos($s_sub,$query)!==false||//題名を検索
-						$query!==''&&($radio===1||$radio===null)&&stripos($s_name,$query)===0||//作者名が含まれる
-						$query!==''&&($radio===2&&$s_name===$query)//作者名完全一致
+				if($q===''||//空白なら
+						$q!==''&&$radio===3&&stripos($s_com,$q)!==false||//本文を検索
+						$q!==''&&$radio===3&&stripos($s_sub,$q)!==false||//題名を検索
+						$q!==''&&($radio===1||$radio===null)&&stripos($s_name,$q)===0||//作者名が含まれる
+						$q!==''&&($radio===2&&$s_name===$q)//作者名完全一致
 				){
 					$hidethumb = ($thumbnail==='hide_thumbnail'||$thumbnail==='hide_');
 
@@ -115,7 +114,7 @@ if($arr){
 
 			$postedtime=(strlen($time)>15) ? substr($time,0,-6) : substr($time,0,-3);
 
-			$postedtime =$time ? (date("Y/m/d G:i", (int)$time)) : '';
+			$postedtime =$postedtime ? (date("Y/m/d G:i", (int)$postedtime)) : '';
 			$sub=h($sub);
 			$com=str_replace('<br />',' ',$com);
 			$com=str_replace('"\n"',' ',$com);
@@ -149,27 +148,20 @@ else{
 }
 $imgsearch= $imgsearch ? true : false;
 
-//クエリを検索窓に入ったままにする
-$query=h($query);
 //ラジオボタンのチェック
 $radio_chk1=false;//作者名
 $radio_chk2=false;//完全一致
 $radio_chk3=false;//本文題名	
-$query_l='&query='.urlencode(h($query));//クエリを次ページにgetで渡す
-if($query!==''&&$radio===3){//本文題名
-	$query_l.='&radio=3';
+if($q!==''&&$radio===3){//本文題名
 	$radio_chk3=true;
 }
-elseif($query!==''&&$radio===2){//完全一致
-	$query_l.='&radio=2';
+elseif($q!==''&&$radio===2){//完全一致
 	$radio_chk2=true;	
 }
-elseif($query!==''&&($radio===null||$radio===1)){//作者名
-	$query_l.='&radio=1';
+elseif($q!==''&&($radio===null||$radio===1)){//作者名
 	$radio_chk1=true;
 }
 else{//作者名	
-	$query_l='';
 	$radio_chk1=true;
 }
 
@@ -182,13 +174,13 @@ if($j&&$page>=2){
 elseif($j){
 		$pageno = $j.$mai_or_ken;
 }
-if($query!==''&&$radio===3){
-	$title=$query.($en ? "'s" : "の").$img_or_com;//titleタグに入る
-	$h1=$query.($en ? "'s ".$img_or_com : "の");//h1タグに入る
+if($q!==''&&$radio===3){
+	$title=$q.($en ? "'s" : "の").$img_or_com;//titleタグに入る
+	$h1=$q.($en ? "'s ".$img_or_com : "の");//h1タグに入る
 }
-elseif($query!==''){
-	$title=$en ? 'posts by '.$query :$query.'さんの'.$img_or_com;
-	$h1=$en ? 'posts by '.$query : $query.'さんの';
+elseif($q!==''){
+	$title=$en ? 'posts by '.$q :$q.'さんの'.$img_or_com;
+	$h1=$en ? 'posts by '.$q : $q.'さんの';
 }
 else{
 	$title=$en ? 'Recent '.$pageno.' Posts' : $boardname.'に投稿された最新の'.$img_or_com;
@@ -196,7 +188,9 @@ else{
 	$pageno=$en ? '':$pageno;
 }
 
+$q_l=$q ? '&q='.h(urlencode($q)):'';//クエリを次ページにgetで渡す
 
+$q=h($q);
 //ページング
 
 $nextpage=$page+$disp_count_of_page;//次ページ
