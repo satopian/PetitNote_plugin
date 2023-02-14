@@ -167,23 +167,20 @@ else{//作者名
 
 $page=(int)$page;
 
-$pageno='';
+$pageno=0;
 if($j&&$page>=2){
 	$pageno = ($page+1).'-'.$j.$mai_or_ken;
 }
-elseif($j){
-		$pageno = $j.$mai_or_ken;
+else{
+	$pageno = $j.$mai_or_ken;
 }
 if($q!==''&&$radio===3){
-	$title=$q.($en ? "'s" : "の").$img_or_com;//titleタグに入る
-	$h1=$q.($en ? "'s ".$img_or_com : "の");//h1タグに入る
+	$h1=($en ? $pageno.' '.$img_or_com.' of '.$q : $q."の".$img_or_com);//h1タグに入る
 }
 elseif($q!==''){
-	$title=$en ? 'posts by '.$q :$q.'さんの'.$img_or_com;
-	$h1=$en ? 'posts by '.$q : $q.'さんの';
+	$h1=$en ? 'Posts by '.$q : $q.'さんの';
 }
 else{
-	$title=$en ? 'Recent '.$pageno.' Posts' : $boardname.'に投稿された最新の'.$img_or_com;
 	$h1=$en ? 'Recent '.$pageno.' Posts' : $boardname.'に投稿された最新の';
 	$pageno=$en ? '':$pageno;
 }
