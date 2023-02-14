@@ -191,8 +191,9 @@ elseif($query!==''){
 	$h1=$en ? 'posts by '.$query : $query.'さんの';
 }
 else{
-	$title=$en ? 'new posts ' : $boardname.'に投稿された最新の'.$img_or_com;
-	$h1=$en ? 'new posts ' : $boardname.'に投稿された最新の';
+	$title=$en ? 'Recent '.$pageno.' Posts' : $boardname.'に投稿された最新の'.$img_or_com;
+	$h1=$en ? 'Recent '.$pageno.' Posts' : $boardname.'に投稿された最新の';
+	$pageno=$en ? '':$pageno;
 }
 
 
