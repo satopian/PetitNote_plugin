@@ -30,11 +30,11 @@
 	</style>
 	<?php endif;?>
 	<title>
-		<?php if($en):?>
-			<?=h($pageno)?> <?=h($title)?>
-		<?php else:?>
-			<?=h($title)?><?=h($pageno)?>
-		<?php endif;?>
+	<?php if($en):?>	
+				displaying <?=h($pageno)?> <?=h($h1)?> 
+				<?php else:?>
+				<?=h($h1)?><?=h($img_or_com)?><?=h($pageno)?>
+				<?php endif;?>
 		</title>
 </head>
 
@@ -92,7 +92,7 @@
 		<?php if($comments):?>
 		<?php if($imgsearch):?>
 		<div class="newimg">
-			<ul><?php foreach($comments as $res):?><li class="catalog"><a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><img
+			<ul><?php foreach($comments as $res):?><li class="catalog <?php if($res['hidethumb']):?>hide_thumbnail<?php endif;?>"><a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><img
 							src="<?=h($res['img'])?>"
 							alt="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
 							title="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
@@ -109,10 +109,10 @@
 							target="_blank"><?=h($res['name'])?></a></span>
 				</div>
 				<?php if($res['img']):?>
-				<a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><img src="<?=h($res['img'])?>"
+				<div <?php if($res['hidethumb']):?>class="posted_image hide_thumbnail"<?php endif;?>><a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><img src="<?=h($res['img'])?>"
 						alt="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
 						title="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
-						loading="lazy" width="<?=h($res['w'])?>" height="<?=h($res['h'])?>"></a><br>
+						loading="lazy" width="<?=h($res['w'])?>" height="<?=h($res['h'])?>"></a></div><br>
 				<?php endif;?>
 				<?=h($res['com'])?>
 				<div class="res_button_wrap">

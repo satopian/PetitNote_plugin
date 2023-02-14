@@ -55,7 +55,9 @@ a:hover {
 
 .catalog {
 	width: 180px;
-	margin: 0 5px 5px 0
+	margin: 0 5px 5px 0;
+	overflow: hidden;
+	vertical-align: text-top;
 }
 
 .catalog img {
@@ -67,6 +69,16 @@ a:hover {
 
 .newimg li:nth-of-type(5n) {
 	margin-right: 0
+}
+
+.posted_image{
+	overflow: hidden;
+	display: inline-block;
+}
+.hide_thumbnail img{
+    filter: blur(15px);
+    max-width: 300px;
+    height: auto;
 }
 
 .clear {

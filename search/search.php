@@ -19,7 +19,7 @@ $skindir = 'template/'.$skindir;
 
 $imgsearch=(bool)filter_input(INPUT_GET,'imgsearch',FILTER_VALIDATE_BOOLEAN);
 $page=(int)filter_input(INPUT_GET,'page',FILTER_VALIDATE_INT);
-$query=filter_input(INPUT_GET,'query');
+$query=(string)filter_input(INPUT_GET,'query');
 $query=urldecode($query);
 $query=mb_convert_kana($query, 'rn', 'UTF-8');
 $query=str_replace(array(" ", "　"), "", $query);
@@ -76,7 +76,11 @@ while ($log = fgets($fp)) {
 						$query!==''&&($radio===1||$radio===null)&&stripos($s_name,$query)===0||//作者名が含まれる
 						$query!==''&&($radio===2&&$s_name===$query)//作者名完全一致
 				){
-					$arr[]=[$no,$name,$sub,$com,$imgfile,$w,$h,$time];
+					$hidethumb = ($thumbnail==='hide_thumbnail'||$thumbnail==='hide_');
+
+					$thumb= ($thumbnail==='hide_thumbnail'||$thumbnail==='thumbnail');
+
+					$arr[]=[$no,$name,$sub,$com,$imgfile,$w,$h,$time,$hidethumb,$thumb];
 					++$i;
 					if($i>=$max_search){break 2;}//1掲示板あたりの最大検索数
 				}
@@ -98,10 +102,10 @@ $comments=[];
 if($arr){
 	foreach($arr as $i => $val){
 		if($i >= $page){//$iが表示するページになるまで待つ
-			list($no,$name,$sub,$com,$imgfile,$w,$h,$time)=$val;
+			list($no,$name,$sub,$com,$imgfile,$w,$h,$time,$hidethumb,$thumb)=$val;
 			$img='';
 			if($imgfile){
-				if(is_file(THUMB_DIR.$time.'s.jpg')){//サムネイルはあるか？
+				if($thumb&&is_file(THUMB_DIR.$time.'s.jpg')){//サムネイルはあるか？
 					$img=THUMB_DIR.$time.'s.jpg';
 				}
 				elseif($imgsearch||is_file(IMG_DIR.$imgfile)){
@@ -122,7 +126,7 @@ if($arr){
 			$name=h($name);
 			$encoded_name=urlencode($name);
 			//変数格納
-			$comments[]= compact('no','name','encoded_name','sub','img','w','h','com','time','postedtime');
+			$comments[]= compact('no','name','encoded_name','sub','img','w','h','com','time','postedtime','hidethumb');
 
 		}
 			$j=$i+1;//表示件数
