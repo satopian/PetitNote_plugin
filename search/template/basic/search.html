@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="preload" as="style" href="<?=h($skindir)?>icomoon/style.css" onload="this.rel='stylesheet'">
+	<link rel="preload" as="script" href="lib/<?=h($jquery)?>">
+	<link rel="stylesheet" href="<?=h($skindir)?>search.css">
+	<style>
+	img {
+		height: auto;
+	}
+	</style>
+<?php if(!$imgsearch):?>
+	<style>
+		.article {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			padding: 3px 0;
+			border-bottom: 1px dashed #8a8a8a;
+			line-height: 3em;
+		}
+
+		img {
+			max-width: 300px;
+			height: auto;
+			margin: 12px 0 0;
+		}
+	</style>
+	<?php endif;?>
+	<title>
+		<?php if($en):?>
+			<?=h($pageno)?> <?=h($title)?>
+		<?php else:?>
+			<?=h($title)?><?=h($pageno)?>
+		<?php endif;?>
+		</title>
+</head>
+
+<body>
+	<div id="main">
+		<header>
+			<div class="title">
+				<h1>
+				<?php if($en):?>	
+				<span class="title_wrap">displaying <?=h($pageno)?></span>	<?=h($h1)?> 
+				<?php else:?>
+				<?=h($h1)?><span class="title_wrap"><?=h($img_or_com)?><?=h($pageno)?></span></h1>
+				<?php endif;?>
+				</h1>
+				</div>
+		</header>
+		<nav>
+			<div class="menu">
+				[<a href="./"><?php if($en):?>Return to bulletin board<?php else:?>掲示板にもどる<?php endif;?></a>]
+				<?php if($imgsearch):?>
+				[<a href="?page=1&imgsearch=off<?=h($query_l)?>"><?php if($en):?>Comments<?php else:?>コメント<?php endif;?></a>]
+				<?php else:?>
+				[<a href="?page=1&imgsearch=on<?=h($query_l)?>"><?php if($en):?>Images<?php else:?>イラスト<?php endif;?></a>]
+				<?php endif;?>
+			</div>
+		
+			<form method="get" action="./search.php">
+			<span class="radio">
+				<input type="radio" name="radio" id="author" value="1" <?php if($radio_chk1):?>checked="checked"<?php endif;?>><label for="author"
+					class="label">
+					<?php if($en):?>Name<?php else:?>名前<?php endif;?>
+					</label>
+						<input type="radio" name="radio" id="exact" value="2" <?php if($radio_chk2):?>checked="checked"<?php endif;?>><label for="exact"
+					class="label">
+					<?php if($en):?>Exact<?php else:?>完全一致<?php endif;?>
+				</label>
+				<input type="radio" name="radio" id="fulltext" value="3" <?php if($radio_chk3):?>checked="checked"<?php endif;?>><label for="fulltext"
+					class="label">
+					<?php if($en):?>Body<?php else:?>本文題名<?php endif;?>	
+				</label>
+			</span>
+			<br>
+			<?php if($imgsearch):?>
+			<input type="hidden" name="imgsearch" value="on">
+			<?php else:?>
+			<input type="hidden" name="imgsearch" value="off">
+			<?php endif;?>
+			<input type="text" name="query" placeholder="<?php if($en):?>Search<?php else:?>検索<?php endif;?>" value="<?=h($query)?>">
+			<input type="submit" value="<?php if($en):?>Search<?php else:?>検索<?php endif;?>">
+		</form>
+		<p></p>
+
+		</nav>
+		<!-- 反復 -->
+		<?php if($comments):?>
+		<?php if($imgsearch):?>
+		<div class="newimg">
+			<ul><?php foreach($comments as $comment):?><li class="catalog"><a href="<?=h($comment['link'])?>" target="_blank"><img
+							src="<?=h($comment['img'])?>"
+							alt="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
+							title="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
+							loading="lazy" width="<?=h($comment['w'])?>" height="<?=h($comment['h'])?>"></a></li><?php endforeach;?></ul>
+		</div>
+		<?php else:?>
+		<?php foreach($comments as $comment):?>
+		<article>
+			<div class="article">
+				<div class="comments_title_wrap">
+					<h2><a href="<?=h($comment['link'])?>" target="_blank"><?=h($comment['sub'])?></a></h2>
+					<?=h($comment['postedtime'])?><br><span class="name"><a
+							href="?page=1&query=<?=h($comment['encoded_name'])?>&radio=2"
+							target="_blank"><?=h($comment['name'])?></a></span>
+				</div>
+				<?php if($comment['img']):?>
+				<a href="<?=h($comment['link'])?>" target="_blank"><img src="<?=h($comment['img'])?>"
+						alt="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
+						title="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
+						loading="lazy" width="<?=h($comment['w'])?>" height="<?=h($comment['h'])?>"></a><br>
+				<?php endif;?>
+				<?=h($comment['com'])?>
+				<div class="res_button_wrap">
+					<form action="<?=h($comment['link'])?>" method="post" target="_blank"><input type="submit" value="<?php if($en):?>Reply<?php else:?>返信<?php endif;?>"
+							class="res_button"></form><span class="page_top"></span>
+				</div>
+			</div>
+		</article>
+		<?php endforeach;?>
+		<?php endif;?>
+		<?php endif;?>
+		<p></p>
+		<?php if($imgsearch):?>
+			<p><?php if($en):?>new arrival images.<?php else:?>掲示板から新規投稿順にイラストを呼び出しています。<?php endif;?></p>
+			<?php else:?>
+			<p><?php if($en):?>new arrival comments.<?php else:?>掲示板から新規投稿順にコメントを呼び出しています。<?php endif;?></p>
+		<?php endif;?>
+		<!-- 最終更新日時 -->
+		<?php if($lastmodified):?>
+		<p>last modified: <?=h($lastmodified)?></p>
+		<?php endif;?>
+
+
+		<footer>
+			<nav>
+				<div class="leftbox">
+
+<!-- ページング -->
+<a href="?page=<?=h($prev)?>"><?=h($prev_txt)?></a><?php if($next):?> | <a href="?page=<?=h($next)?>"><?=h($next_txt)?></a> <?php endif;?>
+				</div>
+				<!-- 著作表示 消さないでください -->
+				<div class="rightbox">- <a href="https://paintbbs.sakura.ne.jp/"
+						target="_blank">search</a> -</div>
+				<div class="clear"></div>
+			</nav>
+		</footer>
+
+	</div>
+	<div id="bottom"></div>
+	<div id="page_top"><a class="icon-angles-up-solid"></a></div>
+	<script src="lib/<?=h($jquery)?>"></script>
+	<script>
+	jQuery(function() {
+		window.onpageshow = function(){
+			var $btn = $('[type="submit"]');
+			//disbledを解除
+			$btn.prop("disabled", false);
+			$btn.click(function(){//送信ボタン2度押し対策
+				$(this).prop('disabled',true);
+				$(this).closest('form').submit();
+			});
+		}
+		// https://cotodama.co/pagetop/
+		var pagetop = $('#page_top');   
+		pagetop.hide();
+		$(window).scroll(function () {
+			if ($(this).scrollTop() > 100) {  //100pxスクロールしたら表示
+				pagetop.fadeIn();
+			} else {
+				pagetop.fadeOut();
+			}
+		});
+		pagetop.click(function () {
+			$('body,html').animate({
+				scrollTop: 0
+			}, 500); //0.5秒かけてトップへ移動
+			return false;
+		});
+	});
+</script></body>
+</html>
