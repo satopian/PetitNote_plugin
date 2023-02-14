@@ -223,6 +223,22 @@ input[type=radio]:checked+label {
 	display: inline-block;
 	margin: 0 0 16px 0
 }
+
+/* 改ページ */
+.pagelink {
+    text-align: center;
+    margin: 12px 0 15px;
+}
+span.next {
+    display: inline-block;
+    text-align: left;
+}
+
+span.prev {
+	display: inline-block;
+    text-align: right;
+}
+
 /* スクロールすると出てくる「トップへ戻る」ボタン */
 /* https://cotodama.co/pagetop/ */
 #page_top {

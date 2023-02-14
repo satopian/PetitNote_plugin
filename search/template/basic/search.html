@@ -55,9 +55,9 @@
 			<div class="menu">
 				[<a href="./"><?php if($en):?>Return to bulletin board<?php else:?>掲示板にもどる<?php endif;?></a>]
 				<?php if($imgsearch):?>
-				[<a href="?page=1&imgsearch=off<?=h($query_l)?>"><?php if($en):?>Comments<?php else:?>コメント<?php endif;?></a>]
+				[<a href="?page=0&imgsearch=off<?=h($query_l)?>"><?php if($en):?>Comments<?php else:?>コメント<?php endif;?></a>]
 				<?php else:?>
-				[<a href="?page=1&imgsearch=on<?=h($query_l)?>"><?php if($en):?>Images<?php else:?>イラスト<?php endif;?></a>]
+				[<a href="?page=0&imgsearch=on<?=h($query_l)?>"><?php if($en):?>Images<?php else:?>イラスト<?php endif;?></a>]
 				<?php endif;?>
 			</div>
 		
@@ -92,31 +92,31 @@
 		<?php if($comments):?>
 		<?php if($imgsearch):?>
 		<div class="newimg">
-			<ul><?php foreach($comments as $comment):?><li class="catalog"><a href="<?=h($comment['link'])?>" target="_blank"><img
-							src="<?=h($comment['img'])?>"
-							alt="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
-							title="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
-							loading="lazy" width="<?=h($comment['w'])?>" height="<?=h($comment['h'])?>"></a></li><?php endforeach;?></ul>
+			<ul><?php foreach($comments as $res):?><li class="catalog"><a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><img
+							src="<?=h($res['img'])?>"
+							alt="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
+							title="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
+							loading="lazy" width="<?=h($res['w'])?>" height="<?=h($res['h'])?>"></a></li><?php endforeach;?></ul>
 		</div>
 		<?php else:?>
-		<?php foreach($comments as $comment):?>
+		<?php foreach($comments as $res):?>
 		<article>
 			<div class="article">
 				<div class="comments_title_wrap">
-					<h2><a href="<?=h($comment['link'])?>" target="_blank"><?=h($comment['sub'])?></a></h2>
-					<?=h($comment['postedtime'])?><br><span class="name"><a
-							href="?page=1&query=<?=h($comment['encoded_name'])?>&radio=2"
-							target="_blank"><?=h($comment['name'])?></a></span>
+					<h2><a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><?=h($res['sub'])?></a></h2>
+					<?=h($res['postedtime'])?><br><span class="name"><a
+							href="?page=0&query=<?=h($res['encoded_name'])?>&radio=2"
+							target="_blank"><?=h($res['name'])?></a></span>
 				</div>
-				<?php if($comment['img']):?>
-				<a href="<?=h($comment['link'])?>" target="_blank"><img src="<?=h($comment['img'])?>"
-						alt="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
-						title="<?=h($comment['sub'])?>by <?=h($comment['name'])?> <?=h($comment['postedtime'])?>"
-						loading="lazy" width="<?=h($comment['w'])?>" height="<?=h($comment['h'])?>"></a><br>
+				<?php if($res['img']):?>
+				<a href="./?resno=<?=h($res['no'])?>#<?=h($res['time'])?>" target="_blank"><img src="<?=h($res['img'])?>"
+						alt="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
+						title="<?=h($res['sub'])?>by <?=h($res['name'])?> <?=h($res['postedtime'])?>"
+						loading="lazy" width="<?=h($res['w'])?>" height="<?=h($res['h'])?>"></a><br>
 				<?php endif;?>
-				<?=h($comment['com'])?>
+				<?=h($res['com'])?>
 				<div class="res_button_wrap">
-					<form action="<?=h($comment['link'])?>" method="post" target="_blank"><input type="submit" value="<?php if($en):?>Reply<?php else:?>返信<?php endif;?>"
+					<form action="./?resno=<?=h($res['no'])?>" method="post" target="_blank"><input type="submit" value="<?php if($en):?>Reply<?php else:?>返信<?php endif;?>"
 							class="res_button"></form><span class="page_top"></span>
 				</div>
 			</div>
@@ -138,11 +138,53 @@
 
 		<footer>
 			<nav>
-				<div class="leftbox">
 
 <!-- ページング -->
-<a href="?page=<?=h($prev)?>"><?=h($prev_txt)?></a><?php if($next):?> | <a href="?page=<?=h($next)?>"><?=h($next_txt)?></a> <?php endif;?>
-				</div>
+	<div class="pagelink">
+		
+	<span class="prev">
+			<?php if($prev!==false):?>
+			<a href="?page=<?=h($prev)?><?=h($search_type.$query_l)?>
+			">≪prev</a>
+	<?php endif;?>
+	</span>
+	| <a href="./">top</a> |
+	<span class="next">
+	<?php if($next):?>
+	<a href="?page=<?=h($next)?><?=h($search_type.$query_l)?>
+	">next≫</a>
+	<?php endif;?>
+	</span>
+</div>
+
+<div class="pagination leftbox">
+<?php if($prev):?>
+<a href="?page=0<?=h($search_type.$query_l)?>">start</a> |
+<?php endif;?>
+
+	<?php for($i = $start_page; ($i < $countarr && $i <= $end_page) ; $i+=$pagedef) :?>
+	<?php if($page==($i)):?>
+			[<strong><?=h($i/$pagedef)?></strong>]
+		<?php else: ?>
+			<?php if($i===0):?>
+				[<a href="?page=0<?=h($search_type.$query_l)?>">0</a>]
+			<?php else:?>	
+			<?php if($i === $end_page):?>
+			<!-- 特定のページに代入される記号 エンド -->
+				[<a href="?page=<?=h($i)?><?=h($search_type.$query_l)?>">≫</a>]
+				<?php elseif($i === $start_page):?>
+				[<a href="?page=<?=h($i)?><?=h($search_type.$query_l)?>">≪</a>]
+					<?php else:?>
+			[<a href="?page=<?=h($i)?><?=h($search_type.$query_l)?>"><?=h($i/$pagedef)?></a>]
+			<?php endif;?>
+			<?php endif;?>
+		<?php endif;?>
+		<?php endfor ;?>
+		<?php if($next):?>
+		| <a href="?page=<?=h(ceil(($countarr/$pagedef)-1)*$pagedef)?><?=h($search_type.$query_l)?>">end</a>
+		<?php endif;?>
+
+</div>
 				<!-- 著作表示 消さないでください -->
 				<div class="rightbox">- <a href="https://paintbbs.sakura.ne.jp/"
 						target="_blank">search</a> -</div>
