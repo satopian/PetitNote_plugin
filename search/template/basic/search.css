@@ -37,15 +37,13 @@ a:hover {
 
 #main {
 	margin: 0 auto;
-	width: 928px
+	max-width: 928px;
 }
-.newimg ul {
-	margin: 0;
+.newimg .catalog {
+	/* margin: 0; */
 	padding: 0
-}
-
-.newimg li {
-	display: inline-block
+	display: inline-block;
+	display: inline-block;
 }
 
 .newimg {
@@ -54,31 +52,38 @@ a:hover {
 }
 
 .catalog {
-	width: 180px;
-	margin: 0 5px 5px 0;
+	width: 19.3%;
+	max-height: 300px;
+	margin: 0 0.8% 0.8% 0;
 	overflow: hidden;
 	vertical-align: text-top;
 }
 
 .catalog img {
-	width: 100%;
+	max-width: 100%;
 	vertical-align: text-top;
 	border: none;
 	height:auto;
 }
 
-.newimg li:nth-of-type(5n) {
+.newimg span:nth-of-type(5n) {
 	margin-right: 0
 }
 
 .posted_image{
 	overflow: hidden;
 	display: inline-block;
+	max-width: 160px;
+	max-height: 350px;
+	height: auto;
+}
+
+.posted_image img {
+    max-width: 100%;
+    height: auto;
 }
 .hide_thumbnail img{
     filter: blur(15px);
-    max-width: 300px;
-    height: auto;
 }
 
 .clear {
@@ -115,14 +120,6 @@ input[type=text] {
 	border: 1px solid #aaa;
 	vertical-align: middle;
 }
-
-input[type=submit] {
-	/* color: #666; */
-	/* border: 1px solid #aaa; */
-	/* background-color: #fff; */
-	vertical-align: middle;
-}
-
 
 .menu {
 	margin: 16px 0 14px
@@ -172,10 +169,6 @@ input[type=submit] {
 	vertical-align: -webkit-baseline-middle
 }
 
-.res_button {
-	width: 5em
-}
-
 .comments_title_wrap {
 	display: block;
 	line-height: 2em;
@@ -197,11 +190,9 @@ input[type=text] {
 }
 
 input[type=submit] {
-	/* border: 1px solid #888; */
 	vertical-align: middle;
-	height: 2em;
-	margin: 0 3px;
-	padding: 0 15px;
+	margin: 0;
+	padding: 1px 12px;
 }
 
 input[type=text]:hover {
@@ -287,41 +278,27 @@ span.prev {
 	text-align: center
 }
 
-@media screen and (max-width:967px) {
-	#main {
-		width: 736px
-	}
-	.newimg li:nth-of-type(5n) {
-		margin-right: 5px
-	}
-
-	.newimg li:nth-of-type(4n) {
-		margin-right: 0
-	}
-
-}
 
 @media screen and (max-width:767px) {
-	#main {
-		width: 100%
-	}
 	.newimg {
 		padding: 5px 0 0 0
 	}
 
 	.catalog {
-		width: 24.2%
+		width: 24.2%;
+		max-height: 220px;
+
 	}
 
 	.catalog {
-		margin: 0 1.0666% 3px 0
+		margin: 0 1.0666% 1.0666% 0
 	}
 
-	.newimg li:nth-of-type(5n) {
+	.newimg span:nth-of-type(5n) {
 		margin-right: 1.0666%
 	}
 
-	.newimg li:nth-of-type(4n) {
+	.newimg span:nth-of-type(4n) {
 		margin-right: 0
 	}
 

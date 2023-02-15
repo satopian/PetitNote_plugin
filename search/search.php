@@ -136,14 +136,14 @@ unset($sub,$name,$no);
 unset($i,$val);
 // var_dump($comments);
 
-$search_type='';
+$imgsearch_l='';
 if($imgsearch){
-	$search_type='&imgsearch=on';
-	$img_or_com=$en ? 'images' : 'イラスト';
+	$imgsearch_l='&imgsearch=on';
+	$img_or_com=$en ? 'Images' : 'イラスト';
 	$mai_or_ken=$en ? ' ' : '枚';
 }
 else{
-	$img_or_com=$en ? 'comments' : 'コメント';
+	$img_or_com=$en ? 'Comments' : 'コメント';
 	$mai_or_ken=$en ? ' ' : '件';
 }
 $imgsearch= $imgsearch ? true : false;
@@ -175,7 +175,7 @@ else{
 	$pageno = $j.$mai_or_ken;
 }
 if($q!==''&&$radio===3){
-	$h1=($en ? $pageno.' '.$img_or_com.' of '.$q : $q."の".$img_or_com);//h1タグに入る
+	$h1=($en ? $img_or_com.' of '.$q : $q."の".$img_or_com);//h1タグに入る
 }
 elseif($q!==''){
 	$h1=$en ? 'Posts by '.$q : $q.'さんの';
