@@ -101,7 +101,7 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 
 				$date=substr($date,0,21);
 				$date= preg_replace('/\(.+\)/', '', $date);//曜日除去
-				$time= $date_to_timestamp ? strtotime($date).'000': substr($_time,-13);
+				$time= $date_to_timestamp ? strtotime($date).'000000': substr($_time,-13).'000';
 				$imgfile='';
 				$time=basename($time);
 				$_time=basename($_time);
