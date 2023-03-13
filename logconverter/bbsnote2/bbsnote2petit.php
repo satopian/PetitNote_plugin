@@ -3,7 +3,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230210
+// lot.230313
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -103,8 +103,9 @@ $en=lang_en();
 $logfiles_arr =(glob($bbsnote_log_dir.'{'.$bbsnote_filehead_logs.'*.'.$bbsnote_log_ext.'}', GLOB_BRACE));//ログファイルをglob
 
 if(!$logfiles_arr){
-		error($en?'Failed to read the BBS Note log file. The setting of the log file heading character is incosect.':'BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
-	}
+	error($en?'Failed to read the BBS Note log file. The setting of the log file heading character is incosect.':'BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
+}
+sort($logfiles_arr);
 
 	$arr_logs=[];
 	foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開いて読み込む
@@ -168,12 +169,12 @@ if(!$logfiles_arr){
 				}else{//BBSNote
 				$painttime='';
 				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,,$applet,$_thumbnail)
-					=explode("\t",$val."\t");
+				=explode("\t",$val."\t"."\t"."\t"."\t"."\t"."\t"."\t"."\t"."\t");
 				$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
 				$time=(int)strtotime($time);//strからUNIXタイムスタンプ
 				}
 
-				$time=$time ? $time*1000 : 0; 
+				$time=$time ? $time.'000000' : 0; 
 				$time=basename($time);
 				$ext = $filename ? '.'.pathinfo($filename,PATHINFO_EXTENSION ) :'';
 				$filename = $filename ? basename($filename) : '';
@@ -193,6 +194,13 @@ if(!$logfiles_arr){
 					$imgfile=$time.$ext;
 					copy("data/$filename","petit/src/{$imgfile}");
 					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
+					if($usethumb&&($thumbnail_size=thumb("petit/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
+						$W=$thumbnail_size['w'];
+						$H=$thumbnail_size['h'];
+						$thumbnail='thumbnail';
+					}else{
+						list($W,$H)=getimagesize("petit/src/{$imgfile}");
+					}
 				}
 				$pch_fname=pathinfo($pch,PATHINFO_FILENAME);
 				
@@ -219,14 +227,6 @@ if(!$logfiles_arr){
 				}
 				$thumbnail='';
 				
-				if($usethumb&&$is_img&&($thumbnail_size=thumb("petit/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
-					$W=$thumbnail_size['w'];
-					$H=$thumbnail_size['h'];
-					$thumbnail='thumbnail';
-				}else{
-					list($W,$H)=getimagesize("petit/src/{$imgfile}");
-				}
-
 				$url = str_replace([" ","　","\t"],'',$url);
 				if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
 					$url="";
@@ -257,7 +257,7 @@ if(!$logfiles_arr){
 					$time=(int)strtotime($time);//strからUNIXタイムスタンプ
 				}
 
-				$time=$time ? $time*1000 : 0; 
+				$time=$time ? $time.'000000' : 0; 
 				$url = str_replace([" ","　","\t"],'',$url);
 				if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
 					$url="";
