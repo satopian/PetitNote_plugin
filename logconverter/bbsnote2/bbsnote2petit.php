@@ -182,15 +182,14 @@ sort($logfiles_arr);
 
 				$ext = (!in_array($ext, ['.pch', '.spch'])) ? basename($ext) : ''; 
 				$_pchext =  (in_array($_pchext, ['pch', 'spch'])) ? $_pchext : '';
-				$is_img=false;
 				//Petit Note形式のファイル名に変更してコピー
 				$imgfile='';
+				$W=$H='';
 				if($ext && is_file("data/$filename")){//画像
 					if($save_at_synonym && is_file("petit/src/{$time}{$ext}")){
 							$time=$time+1;
 					}
 
-					$is_img=true;	
 					$imgfile=$time.$ext;
 					copy("data/$filename","petit/src/{$imgfile}");
 					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
