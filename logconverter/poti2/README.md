@@ -1,5 +1,5 @@
 # ログコンバータ
-## POTI-boardのログファイルをPetitNote形式に変換するログコンバータです。
+## POTI-boardのログファイルをPetit Note形式に変換するログコンバータです。
 
 - ダウンロードは、[お絵かき掲示板 Petit Note のプラグイン](https://github.com/satopian/PetitNote_plugin)のページの緑の｢Code｣ボタンから。  
 - `potiboard.php`と同じディレクトリに配置して、`poti2petit.php`を呼び出してください。   
