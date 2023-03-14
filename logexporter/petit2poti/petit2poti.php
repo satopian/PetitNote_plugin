@@ -3,7 +3,7 @@
 // Petit Note → POTI-board ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230314
+// lot.230315
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -88,12 +88,14 @@ while ($_line = fgets($fp)) {
 	}
 fclose($fp);
 
+natcasesort($log_nos);
+$log_nos=array_values($log_nos);
 
-
+$arr_logs=[];
 foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読み込む
-	$arr_logs=[];
+
 	$log_no = basename($log_no); 
-	$rp = fopen(LOG_DIR."{$log_no}.log", "r");//個別スレッドのログを開く
+	$rp = fopen("log/{$log_no}.log", "r");//個別スレッドのログを開く
 	while($line =fgets($rp)){
 			if(!trim($line)){
 				continue;
@@ -112,6 +114,8 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 	ksort($arr_logs);
 	$arr_logs=array_values($arr_logs);
 
+	$__no=1;
+	$newlog=[];
 	foreach($arr_logs as $i=>$logs){
 	
 		$tree=[];
@@ -149,17 +153,17 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 	
 				//フォーマット
 				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)||!preg_match('{\Ahttps?://}', $url)) $url="";
-					$name = str_replace("◆", "◇", $name);
+				$name = str_replace("◆", "◇", $name);
 			
 				// 改行コード
 				$com = str_replace('"\n"',"<br>",$com);	//改行文字の前に HTMLの改行タグ
 				$email='';
 				$now=now_date($time);
-				$no=(int)$i+1;
-				$newlog[]="$no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$W,$H,$time,$log_md5,$painttime,\n";
+				$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$W,$H,$time,$log_md5,$painttime,\n";
 	
-				$tree[$i]=$no;
+				$tree[]=$__no;
 	
+				++$__no;
 		}
 		$treeline[]=implode(",",$tree)."\n";
 		unset($tree);
