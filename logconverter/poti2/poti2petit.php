@@ -2,7 +2,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 //Licence MIT
-//lot.221011
+//lot.230314
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -58,6 +58,7 @@ while($_line = fgets($fp)){
 
 	$line[]=$_line;
 }
+
 $tp=fopen(TREEFILE,"r");
 while($_tree = fgets($tp)){
 	if(!trim($_tree)){
@@ -152,6 +153,7 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				}
 
 				$url=(strlen($url) < 200) ? $url :'';
+				
 				$sub = $sub ? $sub : DEF_SUB; 
 				if($k===0){//スレッドの親の時
 
@@ -179,7 +181,6 @@ file_put_contents('petit/log/alllog.log',$oya_arr);
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
 echo lang_en() ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
-;
 
 function lang_en(){//言語が日本語以外ならtrue。
 	$lang = ($http_langs = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : '')
