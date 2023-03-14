@@ -69,16 +69,15 @@ date_default_timezone_set(DEFAULT_TIMEZONE);
 
 $en=lang_en();
 
-$logfiles_arr =(glob('log/{*.log}', GLOB_BRACE));//ログファイルをglob
-
-if(!$logfiles_arr){
-	error($en?'Failed to read the BBS Note log file. The setting of the log file heading character is incosect.':'BBSNoteのログファイルの読み込みに失敗しました。BBSNoteのログファイルの頭文字や拡張子の設定が間違っている可能性があります。');
-}
-natcasesort($logfiles_arr);
 
 $newlog=[];
 
 $fp=fopen('log/alllog.log',"r");
+
+if(!$fp){
+	error($en?'Failed to read the Petit Note log file.':'Petit Noteのログファイルの読み込みに失敗しました。');
+}
+
 while ($_line = fgets($fp)) {
 		if(!trim($_line)){
 			continue;
