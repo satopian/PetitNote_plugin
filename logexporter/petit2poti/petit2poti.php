@@ -3,7 +3,7 @@
 // Petit Note → POTI-board ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230313
+// lot.230314
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -77,11 +77,24 @@ if(!$logfiles_arr){
 natcasesort($logfiles_arr);
 
 $newlog=[];
-$__no=1;
-foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開いて読み込む
+
+$fp=fopen('log/alllog.log',"r");
+while ($_line = fgets($fp)) {
+		if(!trim($_line)){
+			continue;
+		}
+		list($_no)=explode("\t",trim($_line));
+		$log_nos[]=$_no;	
+	}
+fclose($fp);
+
+
+
+foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読み込む
 	$arr_logs=[];
-	$fp=fopen($logfile,"r");
-	while($line =fgets($fp)){
+	$log_no = basename($log_no); 
+	$rp = fopen(LOG_DIR."{$log_no}.log", "r");//個別スレッドのログを開く
+	while($line =fgets($rp)){
 			if(!trim($line)){
 				continue;
 			}
@@ -93,71 +106,66 @@ foreach($logfiles_arr as $i=>$logfile){//ログファイルを一つずつ開い
 				}
 			$arr_logs[$i][]=$line;//1スレッド分
 		}
-		fclose($fp);
-		$arr_logs=array_values($arr_logs);
-
+		fclose($rp);
+		
+	}
 	ksort($arr_logs);
-
 	$arr_logs=array_values($arr_logs);
-	foreach($arr_logs as $vals){
-		foreach($vals as $i=>$val){
-			$logs[$i]=$val;
+
+	foreach($arr_logs as $i=>$logs){
+	
+		$tree=[];
+
+		foreach($logs as $k=>$val){//1スレッド分のログを処理
+	
+	
+			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
+			$time=substr($time,0,13);//13桁のUNIXタイムスタンプ
+				$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
+	
+				$ext = (!in_array($ext, ['.pch', '.spch'])) ? basename($ext) : ''; 
+				$pchext =  (in_array($pchext, ['pch', 'spch'])) ? $pchext : '';
+				$W='';
+				$H='';
+				//POTI-board形式のファイル名に変更してコピー
+				if($ext && is_file("src/$imgfile")){//画像
+					if($save_at_synonym && is_file("poti/src/{$time}{$ext}")){
+							$time=$time+1;
+					}
+					copy("src/$imgfile","poti/src/{$time}{$ext}");
+					chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
+					if($usethumb&&($thumbnail_size=thumb("poti/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
+						$W=$thumbnail_size['w'];
+						$H=$thumbnail_size['h'];
+					}else{
+						list($W,$H)=getimagesize("poti/src/{$time}{$ext}");
+					}
+				}
+	
+				if($pchext && is_file("src/$pch")){//動画
+					copy("src/{$time}{$pchext}","poti/src/{$time}{$pchext}");
+					chmod("poti/src/$time.$pchext",PERMISSION_FOR_DEST);
+				}
+	
+				//フォーマット
+				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)||!preg_match('{\Ahttps?://}', $url)) $url="";
+					$name = str_replace("◆", "◇", $name);
+			
+				// 改行コード
+				$com = str_replace('"\n"',"<br>",$com);	//改行文字の前に HTMLの改行タグ
+				$email='';
+				$now=now_date($time);
+				$no=(int)$i+1;
+				$newlog[]="$no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$W,$H,$time,$log_md5,$painttime,\n";
+	
+				$tree[$i]=$no;
+	
 		}
+		$treeline[]=implode(",",$tree)."\n";
+		unset($tree);
+	
 	}
-	$logs=array_values($logs);
 
-
-	$tree=[];
-
-	foreach($logs as $i=>$val){//1スレッド分のログを処理
-
-
-		list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
-		$time=substr($time,0,13);//13桁のUNIXタイムスタンプ
-			$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
-
-			$ext = (!in_array($ext, ['.pch', '.spch'])) ? basename($ext) : ''; 
-			$pchext =  (in_array($pchext, ['pch', 'spch'])) ? $pchext : '';
-			$W='';
-			$H='';
-			//POTI-board形式のファイル名に変更してコピー
-			if($ext && is_file("src/$imgfile")){//画像
-				if($save_at_synonym && is_file("poti/src/{$time}{$ext}")){
-						$time=$time+1;
-				}
-				copy("src/$imgfile","poti/src/{$time}{$ext}");
-				chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
-				if($usethumb&&($thumbnail_size=thumb("poti/src/",$time,$ext,$max_w,$max_h))){//作成されたサムネイルのサイズ
-					$W=$thumbnail_size['w'];
-					$H=$thumbnail_size['h'];
-				}else{
-					list($W,$H)=getimagesize("poti/src/{$time}{$ext}");
-				}
-			}
-
-			if($pchext && is_file("src/$pch")){//動画
-				copy("src/{$time}{$pchext}","poti/src/{$time}{$pchext}");
-				chmod("poti/src/$time.$pchext",PERMISSION_FOR_DEST);
-			}
-
-			//フォーマット
-			$formatted_post = create_formatted_text_from_post($com,$name,$url,$sub);
-			$com = $formatted_post['com'];
-			$name = $formatted_post['name'];
-			$url = $formatted_post['url'];
-			$sub = $formatted_post['sub'];
-			$email='';
-			$now=now_date($time);
-			$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$W,$H,$time,$log_md5,$painttime,\n";
-
-			$tree[]=$__no;
-
-	++$__no;
-	}
-	$treeline[]=implode(",",$tree)."\n";
-	unset($logs,$tree);
-
-}
 unset($oya);
 
 //ツリーログ
@@ -391,26 +399,4 @@ function now_date($time){
 	$date = str_replace("<1>", $yd, $date); //漢字の曜日セット1
 	$date = str_replace("<2>", $yd.'曜', $date); //漢字の曜日セット2
 	return $date;
-}
-//POSTされた入力をチェックしてログファイルに格納する書式にフォーマット
-function create_formatted_text_from_post($com,$name,$url,$sub){
-
-	//入力チェック
-	if(!$com||preg_match("/\A\s*\z/u",$com)) $com="";
-	if(!$name||preg_match("/\A\s*\z/u",$name)) $name="";
-	if(!$sub||preg_match("/\A\s*\z/u",$sub))   $sub="";
-	if(!$url||!filter_var($url,FILTER_VALIDATE_URL)||!preg_match('{\Ahttps?://}', $url)) $url="";
-		$name = str_replace("◆", "◇", $name);
-
-	// 改行コード
-	$com = str_replace('"\n"',"<br>",$com);	//改行文字の前に HTMLの改行タグ
-
-	$formatted_post = [//コメント以外のエスケープと配列への格納
-		'com' => $com,
-		'name' => $name,
-		'url' => $url,
-		'sub' => $sub,
-	];
-	
-	return $formatted_post;
 }
