@@ -3,7 +3,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230313
+// lot.230314
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -71,6 +71,10 @@ $http='http://';//または 'https://'
 
 $defalt_subject = '無題';
 
+/* ----------------- 名前が空欄の時 ----------------- */
+
+$defalt_name = '';//初期値は空欄のまま
+
 /* --------------- タイムゾーン --------------- */
 
 define('DEFAULT_TIMEZONE','Asia/Tokyo');
@@ -123,20 +127,14 @@ sort($logfiles_arr);
 				if($count_arr_line<5){
 					error($en?'Failed to read the log file. The settings may be incorrect.':'ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
 				}
-				if($count_arr_line>20){//スレッドの親?
-					$no=(int)$arr_line[1];
-				}
 			}else{//BBSNote
 				$arr_line=explode("\t",$line);
 				$count_arr_line=count($arr_line);
 				if($count_arr_line<5){
 					error($en?'Failed to read the log file. The settings may be incorrect.':'ログファイルの読み込みに失敗しました。設定が間違っている可能性があります。');
 				}
-				if($count_arr_line>11){//スレッドの親?
-					$no=(int)$arr_line[0];
-				}
 			}
-			$arr_logs[$no][$i][]=$line;//1スレッド分
+			$arr_logs[$i][]=$line;//1スレッド分
 		}
 		fclose($fp);
 	
@@ -144,18 +142,12 @@ sort($logfiles_arr);
 
 	ksort($arr_logs);
 	$arr_logs=array_values($arr_logs);
-	foreach($arr_logs as $vals){
-		foreach($vals as $i=>$val){
-			$logs[$i]=$val;
-		}
-	}
-	$logs=array_values($logs);
 
 	$oya_arr=[];
 	$thread=[];
 
-	foreach($logs as $i=> $log){
-
+	foreach($arr_logs as $i=> $log){
+	
 		$pchext='';
 		$tool='';
 		$resub='';
@@ -226,12 +218,13 @@ sort($logfiles_arr);
 				}
 				$thumbnail='';
 				
-				$url = str_replace([" ","　","\t"],'',$url);
-				if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
+				$url=$url ? $http.$url :'';
+				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)){
 					$url="";
 				}
-				$url=$url ? $http.$url :'';
 				$sub = $sub ? $sub : $defalt_subject;
+				$name = $name ? $name : $defalt_name;
+
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
 				$no=(int)$no;
@@ -257,16 +250,16 @@ sort($logfiles_arr);
 				}
 
 				$time=$time ? $time.'000000' : 0; 
-				$url = str_replace([" ","　","\t"],'',$url);
-				if(!$url||stripos('sage',$url)!==false||preg_match("/&lt;|</i",$url)){
+				$url=$url ? $http.$url :'';
+				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)){
 					$url="";
 				}
-				$url=$url ? $http.$url :'';
 				$thumbnail='';
 				$painttime='';
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
 				$no=(int)$no;
+				$name = $name ? $name : $defalt_name;
 				$res = "$no\t$resub\t$name\t\t$com\t$url\t\t\t\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\tres\n";
 				$thread[$i][]=$res;
 
