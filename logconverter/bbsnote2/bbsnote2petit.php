@@ -1,5 +1,4 @@
 <?php
-
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
@@ -17,12 +16,12 @@ $bbsnote_log_dir = 'data/';
 
 // BBSNoteのログファイルの頭文字
 
-// $bbsnote_filehead_logs = 'MSG';//v7は、'MSG'
+//  $bbsnote_filehead_logs = 'MSG';//v7は、'MSG'
 $bbsnote_filehead_logs = 'LOG';//v8は'LOG'
 
 //BBSNoteのログファイルの拡張子
 
-// $bbsnote_log_ext = 'log';//v7は、'log'
+//  $bbsnote_log_ext = 'log';//v7は、'log'
 $bbsnote_log_ext = 'cgi';//v8は'cgi'
 
 /* --------------- relmから変換 --------------- */
@@ -75,10 +74,6 @@ $defalt_subject = '無題';
 
 $defalt_name = '';//初期値は空欄のまま
 
-/* --------------- タイムゾーン --------------- */
-
-define('DEFAULT_TIMEZONE','Asia/Tokyo');
-
 /* -------------- パーミッション -------------- */
 
 //正常に動作しているときは変更しない。
@@ -90,6 +85,12 @@ define('PERMISSION_FOR_LOG', 0600);//初期値 0600
 define('PERMISSION_FOR_PETIT', 0705);//初期値 PERMISSION_FOR_PETIT
 //画像や動画ファイルを保存するディレクトリのパーミッション
 define('PERMISSION_FOR_DIR', 0707);//初期値 0707
+
+/* -------------- タイムゾーン -------------- */
+
+//タイムゾーン 日本時間で良ければ初期値 "asia/tokyo"
+
+date_default_timezone_set("asia/tokyo");
 
 
 /* ----------- ここから下設定項目なし ----------- */
@@ -151,8 +152,8 @@ sort($logfiles_arr);
 		$pchext='';
 		$tool='';
 		$resub='';
+		$thread=[];
 		foreach($log as $k=>$val){//1スレッド分のログを処理
-			// var_dump($val);
 				$no=$i+1;
 				if($k===0){//スレッドの親
 				if($relm){//relm
