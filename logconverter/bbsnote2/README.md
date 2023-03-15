@@ -1,5 +1,5 @@
 # ログコンバータ
-## BBSNoteのログファイルをPetitNote形式に変換するログコンバータです。
+## BBSNoteのログファイルをPetit Note形式に変換するログコンバータです。
 
 - ダウンロードは、[お絵かき掲示板 Petit Note のプラグイン](https://github.com/satopian/PetitNote_plugin)のページの緑の｢Code｣ダウンロードボタンから。  
 - `bbsnote.cgi`と同じディレクトリに配置して、`bbsnote2petit.php`を呼び出してください。   
