@@ -403,14 +403,3 @@ function now_date($time){
 	$date = str_replace("<2>", $yd.'曜', $date); //漢字の曜日セット2
 	return $date;
 }
-//mimeから拡張子
-function getImgType ($img_type) {
-
-	switch ($img_type) {
-		case "image/gif" : return ".gif";
-		case "image/jpeg" : return ".jpg";
-		case "image/png" : return ".png";
-		case "image/webp" : return ".webp";
-		default : return '';
-	}
-}
