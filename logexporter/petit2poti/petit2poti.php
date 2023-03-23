@@ -125,8 +125,8 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
 			$time=(strlen($time)>15) ? substr($time,0,-3) : $time;
 
-				$ext = $imgfile ? getImgType($imgfile) :'';
-				$ext = basename($ext); 
+			$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
+			$ext = basename($ext); 
 				$pchext =  (in_array($pchext, ['pch', 'spch'])) ? $pchext : '';
 				$W='';
 				$H='';
