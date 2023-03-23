@@ -3,7 +3,7 @@
 // Petit Note → POTI-board ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230315
+// lot.230323
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -123,10 +123,10 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 	
 	
 			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
-			$time=substr($time,0,13);//13桁のUNIXタイムスタンプ
-				$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
-	
-				$ext = (!in_array($ext, ['.pch', '.spch'])) ? basename($ext) : ''; 
+			$time=(strlen($time)>15) ? substr($time,0,-3) : $time;
+
+				$ext = $imgfile ? getImgType($imgfile) :'';
+				$ext = basename($ext); 
 				$pchext =  (in_array($pchext, ['pch', 'spch'])) ? $pchext : '';
 				$W='';
 				$H='';
@@ -402,4 +402,15 @@ function now_date($time){
 	$date = str_replace("<1>", $yd, $date); //漢字の曜日セット1
 	$date = str_replace("<2>", $yd.'曜', $date); //漢字の曜日セット2
 	return $date;
+}
+//mimeから拡張子
+function getImgType ($img_type) {
+
+	switch ($img_type) {
+		case "image/gif" : return ".gif";
+		case "image/jpeg" : return ".jpg";
+		case "image/png" : return ".png";
+		case "image/webp" : return ".webp";
+		default : return '';
+	}
 }
