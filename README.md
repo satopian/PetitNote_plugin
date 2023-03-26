@@ -12,4 +12,4 @@
 - [全体ログ修復ツール](https://github.com/satopian/PetitNote_plugin/tree/main/recoverlog)
 
 ## ログファイルエクスポートツール
-[Petit NoteのログファイルをPOTI-board形式に変換](https://github.com/satopian/PetitNote_plugin/tree/main/logexporter)
+[Petit NoteのログファイルをPOTI-board形式に変換](https://github.com/satopian/PetitNote_plugin/tree/main/logexporter)(PetitNote→POTI-board)
