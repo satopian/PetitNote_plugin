@@ -2,7 +2,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022 さとぴあ(satopian) 
 //Licence MIT
-//lot.230314
+//lot.230412
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -113,7 +113,9 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 					$imgfile=basename($imgfile);
 					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
 					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
-				}
+					//webpサムネイル
+					thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
+			}
 				$thumbnail='';
 				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
 					$thumbnail='thumbnail';
@@ -121,8 +123,6 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 					chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
 				}
 
-				//webpサムネイル
-				thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
 
 				$pchext=check_pch_ext (PCH_DIR.$_time);
 				
@@ -299,8 +299,40 @@ function is_neo($src) {//neoのPCHかどうか調べる
 	return $is_neo;
 }
 
+//GD版が使えるかチェック
+function gd_check(){
+	$check = array("ImageCreate","ImageCopyResized","ImageCreateFromJPEG","ImageJPEG","ImageDestroy");
+
+	//最低限のGD関数が使えるかチェック
+	if(get_gd_ver() && (ImageTypes() & IMG_JPG)){
+		foreach ( $check as $cmd ) {
+			if(!function_exists($cmd)){
+				return false;
+			}
+		}
+	}else{
+		return false;
+	}
+
+	return true;
+}
+
+//gdのバージョンを調べる
+function get_gd_ver(){
+	if(function_exists("gd_info")){
+	$gdver=gd_info();
+	$phpinfo=$gdver["GD Version"];
+	$end=strpos($phpinfo,".");
+	$phpinfo=substr($phpinfo,0,$end);
+	$length = strlen($phpinfo)-1;
+	$phpinfo=substr($phpinfo,$length);
+	return $phpinfo;
+	} 
+	return false;
+}
+
 function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
-	$path=basename($path).'/';
+	$path='petit/src/';
 	$fname=basename($fname);
 	$time=basename($time);
 	$fname=$path.$fname;
@@ -414,7 +446,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 		}
 
 	}elseif(isset($options['webp'])){
-		$outfile='webp/'.$time.'t.webp';
+		$outfile='petit/webp/'.$time.'t.webp';
 		ImageWEBP($im_out, $outfile,90);
 
 	}else{
