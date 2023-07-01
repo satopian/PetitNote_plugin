@@ -3,7 +3,7 @@
 // Petit Note → POTI-board ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230414
+// lot.230701
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -19,6 +19,10 @@ $save_at_synonym=0;// 1.する 0.しない
 
 //1.する の時にコンバートを複数回行うと
 //同じ画像が別名で出力されてしまいます。
+
+/* ------------- 非表示の動画を表示する -------------- */
+$copy_hide_animation = 0; //非表示の動画もコピーする 1.する 0.しない
+//コピーするとPetitNoteでは非表示の動画はPOTI-boardでは表示になります。
 
 
 /* ------------- 日付の書式 ------------- */
@@ -130,7 +134,9 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 					}
 				}
 	
-				if(in_array($pchext,['.pch','.spch','.chi','.psd']) && is_file("src/{$origin_time}{$pchext}")){//動画
+				$pchext = ($copy_hide_animation && ($pchext==='hide_animation')) ? '.pch' : $pchext;
+				$pchext = ($copy_hide_animation && ($pchext==='hide_tgkr')) ? '.tgkr' : $pchext;
+				if(in_array($pchext,['.pch','.spch','.chi','.psd','.tgkr']) && is_file("src/{$origin_time}{$pchext}")){//動画
 					copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
 					chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 				}
@@ -200,27 +206,6 @@ function lang_en(){//言語が日本語以外ならtrue。
 //タブ除去
 function t($str){
 	return str_replace("\t","",$str);
-}
-
-/**
- * pchかspchか、それともファイルが存在しないかチェック
- * @param $filepath
- * @return string
- */
-function check_pch_ext ($filepath) {
-	if (is_file($filepath . ".pch") && is_neo($filepath . ".pch")) {
-		return ".pch";
-	} elseif (is_file($filepath . ".spch")) {
-		return ".spch";
-	}
-	return '';
-}
-
-function is_neo($src) {//neoのPCHかどうか調べる
-	$fp = fopen("$src", "rb");
-	$is_neo=(fread($fp,3)==="NEO");
-	fclose($fp);
-	return $is_neo;
 }
 
 function check_dir ($path) {
