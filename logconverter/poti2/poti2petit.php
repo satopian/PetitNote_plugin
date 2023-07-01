@@ -1,8 +1,8 @@
 <?php
 // POTI-board → Petit Note ログコンバータ。
-// (c)2022 さとぴあ(satopian) 
+// (c)2022-2023 さとぴあ(satopian) 
 //Licence MIT
-//lot.230412
+//lot.230701
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -149,6 +149,9 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 					case '.psd':	
 						$tool='klecks';
 						break;
+					case '.tgkr':	
+						$tool='tegaki';
+						break;
 					default:
 						if($ext){
 							$tool='???';
@@ -275,19 +278,27 @@ function separateDatetimeAndId ($date) {
 }
 
 /**
- * pchかspchか、それともファイルが存在しないかチェック
+ * pchかchiかpsdか、それともファイルが存在しないかチェック
  * @param $filepath
  * @return string
  */
 function check_pch_ext ($filepath) {
-	if (is_file($filepath . ".pch") && is_neo($filepath . ".pch")) {
-		return ".pch";
-	} elseif (is_file($filepath . ".spch")) {
-		return ".spch";
-	} elseif (is_file($filepath . ".chi")) {
-		return ".chi";
-	} elseif (is_file($filepath . ".psd")) {
-		return ".psd";
+	
+	$exts=[".pch",".tgkr",".chi",".psd"];
+
+	foreach($exts as $i => $ext){
+
+		if (is_file($filepath . $ext)) {
+			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","image/vnd.adobe.photoshop"])){
+				return '';
+			}
+			if($ext==='.pch'){
+				if(!is_neo($filepath . ".pch")){
+					return '';
+				};
+			}
+			return $ext;
+		}
 	}
 	return '';
 }
