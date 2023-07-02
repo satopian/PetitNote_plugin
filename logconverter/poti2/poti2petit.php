@@ -288,12 +288,12 @@ function separateDatetimeAndId ($date) {
  */
 function check_pch_ext ($filepath) {
 	
-	$exts=[".pch",".tgkr",".chi",".psd"];
+	$exts=[".pch",".spch",".tgkr",".chi",".psd"];
 
 	foreach($exts as $i => $ext){
 
 		if (is_file($filepath . $ext)) {
-			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","applicatio/octet-binary","image/vnd.adobe.photoshop"])){
+			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","application/gzip","image/vnd.adobe.photoshop"])){
 				return '';
 			}
 			if($ext==='.pch'){
