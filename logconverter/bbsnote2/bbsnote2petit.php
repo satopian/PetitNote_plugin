@@ -310,7 +310,7 @@ function check_pch_ext ($filepath) {
 	foreach($exts as $i => $ext){
 
 		if (is_file($filepath . $ext)) {
-			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","applicatio/octet-binary"])){
+			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","application/gzip"])){
 				return '';
 			}
 			if($ext==='.pch'){
