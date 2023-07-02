@@ -126,7 +126,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 
 				$pchext=check_pch_ext (PCH_DIR.$_time);
 				
-				if($pchext){//動画
+				if($pchext && in_array($pchext,[".pch",".tgkr",".chi",".psd"])){//動画
+					
 					copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
 					chmod("petit/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 				}
@@ -139,6 +140,9 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				switch($pchext){
 					case '.pch':
 						$tool='neo';
+						break;
+					case 'PaintBBS':
+						$tool='PaintBBS';
 						break;
 					case '.spch':
 						$tool='shi-Painter';
@@ -289,12 +293,12 @@ function check_pch_ext ($filepath) {
 	foreach($exts as $i => $ext){
 
 		if (is_file($filepath . $ext)) {
-			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","image/vnd.adobe.photoshop"])){
+			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","applicatio/octet-binary","image/vnd.adobe.photoshop"])){
 				return '';
 			}
 			if($ext==='.pch'){
 				if(!is_neo($filepath . ".pch")){
-					return '';
+					return 'PaintBBS';
 				};
 			}
 			return $ext;

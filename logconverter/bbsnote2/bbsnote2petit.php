@@ -202,8 +202,8 @@ sort($logfiles_arr);
 				$pch_fname=pathinfo($pch,PATHINFO_FILENAME);
 				
 				$pchext=$_pchext ? check_pch_ext($bbsnote_log_dir.$pch_fname):'';
-				if($pchext && is_file($bbsnote_log_dir.$pch)){//動画
-					copy($bbsnote_log_dir.$pch,"petit/src/{$time}{$pchext}");
+				if($pchext && in_array($pchext,[".pch",".spch"])){//動画
+					copy($bbsnote_log_dir.$pch_fname.$pchext,"petit/src/{$time}{$pchext}");
 					chmod("petit/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 				}
 
@@ -212,6 +212,9 @@ sort($logfiles_arr);
 				switch($pchext){
 					case '.pch':
 						$tool='neo';
+						break;
+					case 'PaintBBS':
+						$tool='PaintBBS';
 						break;
 					case '.spch':
 						$tool='shi-Painter';
@@ -296,15 +299,27 @@ function t($str){
 }
 
 /**
- * pchかspchか、それともファイルが存在しないかチェック
+ * pchかchiかpsdか、それともファイルが存在しないかチェック
  * @param $filepath
  * @return string
  */
 function check_pch_ext ($filepath) {
-	if (is_file($filepath . ".pch") && is_neo($filepath . ".pch")) {
-		return ".pch";
-	} elseif (is_file($filepath . ".spch")) {
-		return ".spch";
+	
+	$exts=[".pch",".spch"];
+
+	foreach($exts as $i => $ext){
+
+		if (is_file($filepath . $ext)) {
+			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","applicatio/octet-binary"])){
+				return '';
+			}
+			if($ext==='.pch'){
+				if(!is_neo($filepath . ".pch")){
+					return 'PaintBBS';
+				};
+			}
+			return $ext;
+		}
 	}
 	return '';
 }
