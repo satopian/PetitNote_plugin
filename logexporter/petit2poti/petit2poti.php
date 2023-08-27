@@ -3,7 +3,7 @@
 // Petit Note → POTI-board ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 // Licence MIT
-// lot.230701
+// lot.230828
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -129,28 +129,37 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 					copy("src/$imgfile","poti/src/{$time}{$ext}");
 					chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
 					if(($thumbnail==='thumbnail'||$thumbnail==='hide_thumbnail')&&is_file("thumbnail/{$origin_time}s.jpg")){
-						copy("thumbnail/{$origin_time}s.jpg","poti/thumb/{$time}s.jpg");
-						chmod("poti/thumb/{$time}s.jpg",PERMISSION_FOR_DEST);
+						$thumbnail="thumbnail";
+						if(!$save_at_synonym && !is_file("poti/thumb/{$time}s.jpg")){
+							copy("thumbnail/{$origin_time}s.jpg","poti/thumb/{$time}s.jpg");
+							chmod("poti/thumb/{$time}s.jpg",PERMISSION_FOR_DEST);
+						}
 					}
 				}
 	
 				$pchext = ($copy_hide_animation && ($pchext==='hide_animation')) ? '.pch' : $pchext;
 				$pchext = ($copy_hide_animation && ($pchext==='hide_tgkr')) ? '.tgkr' : $pchext;
 				if(in_array($pchext,['.pch','.spch','.chi','.psd','.tgkr']) && is_file("src/{$origin_time}{$pchext}")){//動画
-					copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
-					chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
+					if(!$save_at_synonym && !is_file("poti/src/{$time}{$pchext}")){
+						copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
+						chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
+					}
 				}
 	
 				//フォーマット
 				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)||!preg_match('{\Ahttps?://}', $url)) $url="";
 				$name = str_replace("◆", "◇", $name);
+
 			
 				// 改行コード
 				$com = str_replace('"\n"',"<br>",$com);	//改行文字の前に HTMLの改行タグ
 				$email='';
-				$now=now_date($time);
-				$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$time,$log_md5,$painttime,\n";
-	
+				$now_time = substr($time,0,-3);
+				$now=now_date($now_time);
+				$now .=  $userid ? " ID:" . $userid : "";
+				$tool =switch_tool($tool);
+				$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$time,$log_md5,$painttime,,$pchext,$thumbnail,$tool,6\n";
+
 				$tree[]=$__no;
 	
 				++$__no;
@@ -233,3 +242,32 @@ function check_petit ($path) {
 	}
 }
 
+function switch_tool($tool){
+	switch($tool){
+		case 'neo':
+			$tool='PaintBBS NEO';
+			break;
+		case 'PaintBBS':
+			$tool='PaintBBS';
+			break;
+		case 'shi-Painter':
+			$tool='shi-Painter';
+			break;
+		case 'chi':
+			$tool='ChickenPaint';
+			break;
+		case 'klecks';
+			$tool='Klecks';
+			break;
+		case 'tegaki';
+			$tool='Tegaki';
+			break;
+		case 'upload':
+			$tool='Upload';
+			break;
+		default:
+			$tool='';
+			break;
+	}
+	return $tool;
+}
