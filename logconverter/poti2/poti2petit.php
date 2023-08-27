@@ -2,7 +2,7 @@
 // POTI-board → Petit Note ログコンバータ。
 // (c)2022-2023 さとぴあ(satopian) 
 //Licence MIT
-//lot.230701
+//lot.230827
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -24,7 +24,7 @@ $date_to_timestamp=false;
 
 //設定ファイルの読み込み
 if ($err = check_file(__DIR__.'/config.php')) {
-	die($err);
+	die(h($err));
 }
 require(__DIR__.'/config.php');
 
@@ -91,11 +91,12 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				$no=$i+1;
 
 				// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
-				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,)
-				=explode(",",rtrim(t($line[$j])).',,,');
+				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,,,$tool,$logver)
+				=explode(",",rtrim(t($line[$j])).',,,,,,,,');
 				
+				$paintsec=is_numeric($_ptime) ? $_ptime :'';
+				$painttime= isset($painttime) ? $painttime : $paintsec;
 
-				$painttime=is_numeric($_ptime) ? $_ptime :''; 
 				//名前とトリップを分離
 				list($name, $trip) = separateNameAndTrip($name);
 
@@ -103,7 +104,7 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 
 				$date=substr($date,0,21);
 				$date= preg_replace('/\(.+\)/', '', $date);//曜日除去
-				$time= $date_to_timestamp ? strtotime($date).'000000': substr($_time,-13).'000';
+				$time= $date_to_timestamp ? strtotime($date).'000000': (($logver==="6") ? $_time.'000' : substr($_time,-13).'000');
 				$imgfile='';
 				$time=basename($time);
 				$_time=basename($_time);
@@ -111,18 +112,23 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
 					$imgfile=$time.$ext;
 					$imgfile=basename($imgfile);
-					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
-					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
+					if(!is_file("petit/src/{$imgfile}")){
+						copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
+						chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
+					}
 					//webpサムネイル
-					thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
+					if(!is_file("petit/webp/{$time}t.webp")){
+						thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
+					}
 			}
 				$thumbnail='';
 				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
 					$thumbnail='thumbnail';
-					copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
-					chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
+					if(!is_file("petit/thumbnail/{$time}s.jpg")){
+						copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
+						chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
+					}
 				}
-
 
 				$pchext=check_pch_ext (PCH_DIR.$_time);
 				
@@ -135,32 +141,33 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
 				$com=strip_tags($com);
 
-				$tool='';
-				
-				switch($pchext){
-					case '.pch':
-						$tool='neo';
-						break;
-					case 'PaintBBS':
-						$tool='PaintBBS';
-						break;
-					case '.spch':
-						$tool='shi-Painter';
-						break;
-					case '.chi':
-						$tool='chi';
-						break;
-					case '.psd':	
-						$tool='klecks';
-						break;
-					case '.tgkr':	
-						$tool='tegaki';
-						break;
-					default:
-						if($ext){
-							$tool='???';
-						}
-						break;
+				$tool = switch_tool($tool);
+				if(!$tool){
+					switch($pchext){
+						case '.pch':
+							$tool='neo';
+							break;
+						case 'PaintBBS':
+							$tool='PaintBBS';
+							break;
+						case '.spch':
+							$tool='shi-Painter';
+							break;
+						case '.chi':
+							$tool='chi';
+							break;
+						case '.psd':	
+							$tool='klecks';
+							break;
+						case '.tgkr':	
+							$tool='tegaki';
+							break;
+						default:
+							if($ext){
+								$tool='???';
+							}
+							break;
+					}
 				}
 
 				$url=(strlen($url) < 200) ? $url :'';
@@ -479,4 +486,33 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 
 	return is_file($outfile);
 
+}
+function switch_tool($tool){
+	switch($tool){
+		case 'PaintBBS NEO':
+			$tool='neo';
+			break;
+		case 'PaintBBS':
+			$tool='PaintBBS';
+			break;
+		case 'shi-Painter':
+			$tool='shi-Painter';
+			break;
+		case 'ChickenPaint':
+			$tool='chi';
+			break;
+		case 'Klecks';
+			$tool='klecks';
+			break;
+		case 'Tegaki';
+			$tool='tegaki';
+			break;
+		case 'Upload':
+			'upload';
+			break;
+		default:
+			$tool='';
+			break;
+	}
+	return $tool;
 }
