@@ -495,7 +495,7 @@ function switch_tool($tool){
 		case 'PaintBBS':
 			$tool='PaintBBS';
 			break;
-		case 'shi-Painter':
+		case 'Shi-Painter':
 			$tool='shi-Painter';
 			break;
 		case 'ChickenPaint':
