@@ -1,6 +1,6 @@
 <?php
 // Petit Noteの最新画像をサイトの入り口のHTMLファイルに呼び出すphp
-// newimg.php(c)さとぴあ(satopian) 2020-2022 lot.220327
+// newimg.php(c)さとぴあ(satopian) 2020-2023 lot.231020
 // Licence MIT
 //---------------- 設定 ----------------
 
@@ -57,22 +57,11 @@ $filename=$arr[0];
 }
 //画像を出力
 $img_type=mime_content_type($filename);
+if (!in_array($img_type, ['image/gif', 'image/jpeg', 'image/png','image/webp'])) {
+return;
+}
 
-switch ($img_type):
-	case 'image/png':
-		header('Content-Type: image/png');
-		break;
-	case 'image/jpeg':
-		header('Content-Type: image/jpeg');
-		break;
-	case 'image/gif':
-		header('Content-Type: image/gif');
-		break;
-	case 'image/webp':
-		header('Content-Type: image/webp');
-		break;
-	default :
-		header('Content-Type: image/png');
-	endswitch;
+header('Content-Type: '.$img_type);
 		
 readfile($filename);
+
