@@ -147,9 +147,6 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 						case '.pch':
 							$tool='neo';
 							break;
-						case 'PaintBBS':
-							$tool='PaintBBS';
-							break;
 						case '.spch':
 							$tool='shi-Painter';
 							break;
