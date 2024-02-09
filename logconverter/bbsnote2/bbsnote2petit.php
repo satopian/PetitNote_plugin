@@ -240,7 +240,7 @@ sort($logfiles_arr);
 				$thread[$i][] = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
 
 				$strcut_com=mb_strcut($com,0,120);
-				$oya_arr[] = "$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
+				$oya_arr[$i] = "$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$W\t$H\t$thumbnail\t$painttime\t\t$tool\t$pchext\t$time\t$time\t$host\t\t\toya\n";
 
 
 				$resub=$sub ? "Re: {$sub}" :'';
@@ -279,7 +279,7 @@ sort($logfiles_arr);
 		}
 	}
 
-$oya_arr=array_reverse($oya_arr, false);
+krsort($oya_arr);
 file_put_contents('petit/log/alllog.log',$oya_arr);
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
