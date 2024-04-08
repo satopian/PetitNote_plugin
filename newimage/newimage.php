@@ -9,9 +9,6 @@
 $default='./thumbnail/ogimage.png';
 //例
 // $default='https://example.com/bbs/image.png';
-//設定しないなら初期値の
-// $default='';
-//で。
 
 //--------- 説明と設定ここまで ---------
 
@@ -32,9 +29,9 @@ $arr=[];
 				$imgfile=basename($imgfile);
 				$time=basename($time);
 				if ($imgfile){
-					if($thumbnail==='hide_thumbnail'||$thumbnail==='hide_'){
+					if(strpos($thumbnail,'hide_')!==false){
 						$arr[$time]=$default;
-					}elseif($thumbnail==='thumbnail'){
+					}elseif(strpos($thumbnail,'thumbnail')!==false){
 						$arr[$time]='thumbnail/'.$time.'s.jpg';
 					}else{
 						$arr[$time]='src/'.$imgfile;
