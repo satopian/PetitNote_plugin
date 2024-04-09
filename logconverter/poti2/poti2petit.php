@@ -80,114 +80,118 @@ check_dir('petit/webp');
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
 foreach($trees as $i=>$tree){//ツリーの読み込み
-			$treeline = explode(",", rtrim($tree));
-			// レス省略
-			//レス作成
-			$thread=[];
-			foreach($treeline as $k => $disptree){
-				if(!isset($lineindex[$disptree])) continue;
-				$j=$lineindex[$disptree];
+		$treeline = explode(",", rtrim($tree));
+		// レス省略
+		//レス作成
+		$thread=[];
+		foreach($treeline as $k => $disptree){
+			if(!isset($lineindex[$disptree])) continue;
+			$j=$lineindex[$disptree];
 
-				$no=$i+1;
+			$no=$i+1;
 
-				// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
-				list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,,,$tool,$logver)
-				=explode(",",rtrim(t($line[$j])).',,,,,,,,');
-				
-				$paintsec=is_numeric($_ptime) ? $_ptime :'';
-				$painttime= isset($painttime) ? $painttime : $paintsec;
+			// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
+			list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,,,$tool,$logver)
+			=explode(",",rtrim(t($line[$j])).',,,,,,,,');
+			
+			$paintsec=is_numeric($_ptime) ? $_ptime :'';
+			$painttime= isset($painttime) ? $painttime : $paintsec;
 
-				//名前とトリップを分離
-				list($name, $trip) = separateNameAndTrip($name);
+			//名前とトリップを分離
+			list($name, $trip) = separateNameAndTrip($name);
 
-				list($userid,) = separateDatetimeAndId($date);
+			list($userid,) = separateDatetimeAndId($date);
 
-				$date=substr($date,0,21);
-				$date= preg_replace('/\(.+\)/', '', $date);//曜日除去
-				$time= $date_to_timestamp ? strtotime($date).'000000': (($logver==="6") ? $_time.'000' : substr($_time,-13).'000');
-				$imgfile='';
-				$time=basename($time);
-				$_time=basename($_time);
-				$ext=basename($ext);
-				if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
-					$imgfile=$time.$ext;
-					$imgfile=basename($imgfile);
-					if(!is_file("petit/src/{$imgfile}")){
-						copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
-						chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
-					}
-					//webpサムネイル
-					if(!is_file("petit/webp/{$time}t.webp")){
-						thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
-					}
-			}
-				$thumbnail='';
-				if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
-					$thumbnail='thumbnail';
-					if(!is_file("petit/thumbnail/{$time}s.jpg")){
-						copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
-						chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
-					}
+			$date=substr($date,0,21);
+			$date= preg_replace('/\(.+\)/', '', $date);//曜日除去
+			$time= $date_to_timestamp ? strtotime($date).'000000': (($logver==="6") ? $_time.'000' : substr($_time,-13).'000');
+			$imgfile='';
+			$time=basename($time);
+			$_time=basename($_time);
+			$ext=basename($ext);
+			if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
+				$imgfile=$time.$ext;
+				$imgfile=basename($imgfile);
+				if(!is_file("petit/src/{$imgfile}")){
+					copy(IMG_DIR.$_time.$ext,"petit/src/{$imgfile}");
+					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
 				}
+				//webpサムネイル
+				if(!is_file("petit/webp/{$time}t.webp")){
+					thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
+				}
+			}
+			$thumbnail='';
+			if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
+				$thumbnail='thumbnail';
+				if(!is_file("petit/thumbnail/{$time}s.jpg")){
+					copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
+					chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
+				}
+				if(is_file("petit/thumbnail/{$time}s.jpg")){
+					$wep_thumbnail = make_thumbnail($imgfile,$time,$w,$h);
+					$thumbnail = $wep_thumbnail ? $wep_thumbnail : $thumbnail; 
+				}
+			}
 
-				$pchext=check_pch_ext (PCH_DIR.$_time);
+			$pchext=check_pch_ext (PCH_DIR.$_time);
 				
-				if($pchext && in_array($pchext,[".pch",".tgkr",".chi",".psd"])){//動画
+			if($pchext && in_array($pchext,[".pch",".tgkr",".chi",".psd"])){//動画
 					
-					copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
-					chmod("petit/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
-				}
+				copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
+				chmod("petit/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
+			}
 	
-				$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
-				$com=strip_tags($com);
+			$com = preg_replace("#<br( *)/?>#i",'"\n"',$com); //<br />を"\n"に
+			$com=strip_tags($com);
 
-				$tool = switch_tool($tool);
-				if(!$tool){
-					switch($pchext){
-						case '.pch':
-							$tool='neo';
-							break;
-						case '.spch':
-							$tool='shi-Painter';
-							break;
-						case '.chi':
-							$tool='chi';
-							break;
-						case '.psd':	
-							$tool='klecks';
-							break;
-						case '.tgkr':	
-							$tool='tegaki';
-							break;
-						default:
-							if($ext){
-								$tool='???';
-							}
-							break;
-					}
-				}
-
-				$url=(strlen($url) < 200) ? $url :'';
-				
-				$sub = $sub ? $sub : DEF_SUB; 
-				if($k===0){//スレッドの親の時
-
-					$thread[$i][]="$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
-
-
-					$strcut_com=mb_strcut($com,0,120);
-					$oya_arr[$i]=	"$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
-
-				}else{
-				
-					$res = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\tres\n";
-
-					$thread[$i][]=$res;
-
+			$tool = switch_tool($tool);
+			if(!$tool){
+				switch($pchext){
+					case '.pch':
+						$tool='neo';
+						break;
+					case '.spch':
+						$tool='shi-Painter';
+						break;
+					case '.chi':
+						$tool='chi';
+						break;
+					case '.psd':	
+						$tool='klecks';
+						break;
+					case '.tgkr':	
+						$tool='tegaki';
+						break;
+					default:
+						if($ext){
+							$tool='';
+						}
+						break;
 				}
 			}
-				file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
-				chmod('petit/log/'.$no.'.log',PERMISSION_FOR_LOG);	
+
+			$url=(strlen($url) < 200) ? $url :'';
+			
+			$sub = $sub ? $sub : DEF_SUB; 
+			if($k===0){//スレッドの親の時
+
+				$thread[$i][]="$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
+
+
+				$strcut_com=mb_strcut($com,0,120);
+				$oya_arr[$i]=	"$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
+
+			}else{
+			
+				$res = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\tres\n";
+
+				$thread[$i][]=$res;
+
+			}
+		}
+		file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
+		chmod('petit/log/'.$no.'.log',PERMISSION_FOR_LOG);	
 
 }
 
@@ -350,6 +354,21 @@ function get_gd_ver(){
 	return false;
 }
 
+function make_thumbnail($imgfile,$time,$max_w,$max_h){
+	$thumbnail='';
+	$path='petit/src/';
+	// if($use_thumb){//スレッドの画像のサムネイルを使う時
+
+		if(thumb($path,$imgfile,$time,$max_w,$max_h,['thumbnail_webp'=>true])){
+			$thumbnail='thumbnail_webp';
+		}
+	// }
+	//カタログ用webpサムネイル 
+	thumb($path,$imgfile,$time,300,800,['webp'=>true]);
+
+	return $thumbnail;
+}
+
 function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	$path='petit/src/';
 	$fname=basename($fname);
@@ -361,7 +380,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	if(!gd_check()||!function_exists("ImageCreate")||!function_exists("ImageCreateFromJPEG")){
 		return;
 	}
-	if(isset($options['webp']) &&(!function_exists("ImageWEBP")||version_compare(PHP_VERSION, '7.0.0', '<'))){
+	if((isset($options['webp'])||isset($options['thumbnail_webp'])) && (!function_exists("ImageWEBP")||version_compare(PHP_VERSION, '7.0.0', '<'))){
 		return;
 	}
 
@@ -400,7 +419,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 				if(!$im_in)return;
 			break;
 		case "image/webp";
-			if(!function_exists("ImageCreateFromWEBP")){//webp
+			if(!function_exists("ImageCreateFromWEBP")||version_compare(PHP_VERSION, '7.0.0', '<')){//webp
 				return;
 			}
 			$im_in = @ImageCreateFromWEBP($fname);
@@ -413,7 +432,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	$exists_ImageCopyResampled = false;
 	if(function_exists("ImageCreateTrueColor")&&get_gd_ver()=="2"){
 		$im_out = ImageCreateTrueColor($out_w, $out_h);
-		if((isset($options['toolarge'])||isset($options['webp'])) && in_array($mime_type,["image/png","image/gif","image/webp"])){
+		if((isset($options['toolarge'])||isset($options['webp'])||isset($options['thumbnail_webp'])) && in_array($mime_type,["image/png","image/gif","image/webp"])){
 			if(function_exists("imagealphablending") && function_exists("imagesavealpha")){
 				imagealphablending($im_out, false);
 				imagesavealpha($im_out, true);//透明
@@ -468,8 +487,11 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 		$outfile='petit/webp/'.$time.'t.webp';
 		ImageWEBP($im_out, $outfile,90);
 
+	}elseif(isset($options['thumbnail_webp'])){
+		$outfile='petit/thumbnail/'.$time.'s.webp';
+		ImageWEBP($im_out, $outfile,90);
 	}else{
-		$outfile=THUMB_DIR.$time.'s.jpg';
+		$outfile='petit/thumbnail/'.$time.'s.jpg';
 		// サムネイル画像を保存
 		ImageJPEG($im_out, $outfile,90);
 	}
@@ -513,3 +535,4 @@ function switch_tool($tool){
 	}
 	return $tool;
 }
+
