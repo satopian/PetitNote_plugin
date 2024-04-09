@@ -49,8 +49,8 @@ $save_at_synonym=0;// 1.する 0.しない
 /* -------------- サムネイル設定 -------------- */
 
 $usethumb=1;//サムネイルを作成する する 1 しない 0
-$max_w=800;//この幅を超えたらサムネイル
-$max_h=800;//この高さを超えたらサムネイル
+$max_w=300;//この幅を超えたらサムネイル
+$max_h=300;//この高さを超えたらサムネイル
 // この値をあまり小さくしないでください。例えば100に設定すると幅や高さが100以上のときにサムネイルを作ります。
 //しかし、全ログファイルの一括処理のためそれではサーバに大きな負荷がかかります。
 //もしもサーバ負荷の懸念がある場合は、「サムネイルを作成しない」にしたほうが無難です。
@@ -155,8 +155,8 @@ sort($logfiles_arr);
 		$resub='';
 		$thread=[];
 		foreach($log as $k=>$val){//1スレッド分のログを処理
-				$no=$i+1;
-				if($k===0){//スレッドの親
+			$no=$i+1;
+			if($k===0){//スレッドの親
 				if($relm){//relm
 				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$painttime,)
 					=explode("<>",$val);
@@ -179,6 +179,7 @@ sort($logfiles_arr);
 				//Petit Note形式のファイル名に変更してコピー
 				$imgfile='';
 				$W=$H='';
+				$thumbnail='';
 				if($ext && is_file("data/$filename")){//画像
 
 					if($save_at_synonym && is_file("petit/src/{$time}{$ext}")){
@@ -195,6 +196,10 @@ sort($logfiles_arr);
 					if($usethumb && thumb("petit/src/",$imgfile,$time,$max_w,$max_h)){
 						$thumbnail='thumbnail';
 					}
+					if($thumbnail && thumb("petit/src/",$imgfile,$time,$max_w,$max_h,['thumbnail_webp'=>true])){
+						$thumbnail='thumbnail_webp';
+					}
+			
 					//webpサムネイル
 					thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
 			
@@ -225,7 +230,6 @@ sort($logfiles_arr);
 						}
 						break;
 				}
-				$thumbnail='';
 				
 				$url=$url ? $http.$url :'';
 				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)){
@@ -406,7 +410,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	if(!gd_check()||!function_exists("ImageCreate")||!function_exists("ImageCreateFromJPEG")){
 		return;
 	}
-	if(isset($options['webp']) &&(!function_exists("ImageWEBP")||version_compare(PHP_VERSION, '7.0.0', '<'))){
+	if((isset($options['webp'])||isset($options['thumbnail_webp'])) && (!function_exists("ImageWEBP")||version_compare(PHP_VERSION, '7.0.0', '<'))){
 		return;
 	}
 
@@ -445,7 +449,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 				if(!$im_in)return;
 			break;
 		case "image/webp";
-			if(!function_exists("ImageCreateFromWEBP")){//webp
+			if(!function_exists("ImageCreateFromWEBP")||version_compare(PHP_VERSION, '7.0.0', '<')){//webp
 				return;
 			}
 			$im_in = @ImageCreateFromWEBP($fname);
@@ -458,7 +462,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	$exists_ImageCopyResampled = false;
 	if(function_exists("ImageCreateTrueColor")&&get_gd_ver()=="2"){
 		$im_out = ImageCreateTrueColor($out_w, $out_h);
-		if((isset($options['toolarge'])||isset($options['webp'])) && in_array($mime_type,["image/png","image/gif","image/webp"])){
+		if((isset($options['toolarge'])||isset($options['webp'])||isset($options['thumbnail_webp'])) && in_array($mime_type,["image/png","image/gif","image/webp"])){
 			if(function_exists("imagealphablending") && function_exists("imagesavealpha")){
 				imagealphablending($im_out, false);
 				imagesavealpha($im_out, true);//透明
@@ -513,6 +517,9 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 		$outfile='petit/webp/'.$time.'t.webp';
 		ImageWEBP($im_out, $outfile,90);
 
+	}elseif(isset($options['thumbnail_webp'])){
+		$outfile='petit/thumbnail/'.$time.'s.webp';
+		ImageWEBP($im_out, $outfile,90);
 	}else{
 		$outfile='petit/thumbnail/'.$time.'s.jpg';
 		// サムネイル画像を保存
