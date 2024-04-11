@@ -1,8 +1,8 @@
 <?php
 // POTI-board → Petit Note ログコンバータ。
-// (c)2022-2023 さとぴあ(satopian) 
+// (c)2022-2024 さとぴあ(satopian) 
 //Licence MIT
-//lot.230827
+//lot.240411
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -123,15 +123,17 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 			}
 			$thumbnail='';
 			if($ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
-				$thumbnail='thumbnail';
 				if(!is_file("petit/thumbnail/{$time}s.jpg")){
 					copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
 					chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
 				}
 				if(is_file("petit/thumbnail/{$time}s.jpg")){
-					$wep_thumbnail = make_thumbnail($imgfile,$time,$w,$h);
-					$thumbnail = $wep_thumbnail ? $wep_thumbnail : $thumbnail; 
+					$thumbnail='thumbnail';
 				}
+				if($thumbnail && thumb('petit/src/',$imgfile,$time,$w,$h,['thumbnail_webp'=>true])){
+					$thumbnail='thumbnail_webp';
+				}
+		
 			}
 
 			$pchext=check_pch_ext (PCH_DIR.$_time);
@@ -354,20 +356,6 @@ function get_gd_ver(){
 	return false;
 }
 
-function make_thumbnail($imgfile,$time,$max_w,$max_h){
-	$thumbnail='';
-	$path='petit/src/';
-	// if($use_thumb){//スレッドの画像のサムネイルを使う時
-
-		if(thumb($path,$imgfile,$time,$max_w,$max_h,['thumbnail_webp'=>true])){
-			$thumbnail='thumbnail_webp';
-		}
-	// }
-	//カタログ用webpサムネイル 
-	thumb($path,$imgfile,$time,300,800,['webp'=>true]);
-
-	return $thumbnail;
-}
 
 function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	$path='petit/src/';
