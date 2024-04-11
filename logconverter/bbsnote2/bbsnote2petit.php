@@ -1,8 +1,8 @@
 <?php
 // POTI-board → Petit Note ログコンバータ。
-// (c)2022-2023 さとぴあ(satopian) 
+// (c)2022-2024 さとぴあ(satopian) 
 // Licence MIT
-// lot.230412
+// lot.240411
 
 /* ------------- 設定項目ここから ------------- */
 
