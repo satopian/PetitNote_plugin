@@ -1,9 +1,9 @@
 <?php
 
 // Petit Note → POTI-board ログコンバータ。
-// (c)2022-2023 さとぴあ(satopian) 
+// (c)2022-2024 さとぴあ(satopian) 
 // Licence MIT
-// lot.230828
+// lot.240411
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -121,16 +121,19 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 			$time=(strlen($time)>15) ? substr($time,0,-3) : $time;
 			$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
 			$ext = basename($ext); 
-				//POTI-board形式のファイル名に変更してコピー
+			//POTI-board形式のファイル名に変更してコピー
 				if($ext && is_file("src/$imgfile")){//画像
 					if($save_at_synonym && is_file("poti/src/{$time}{$ext}")){
 							$time=$time+1;
 					}
-					copy("src/$imgfile","poti/src/{$time}{$ext}");
-					chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
-					if(($thumbnail==='thumbnail'||$thumbnail==='hide_thumbnail')&&is_file("thumbnail/{$origin_time}s.jpg")){
-						$thumbnail="thumbnail";
-						if(!$save_at_synonym && !is_file("poti/thumb/{$time}s.jpg")){
+					if(!is_file("poti/src/{$time}{$ext}")){
+						copy("src/$imgfile","poti/src/{$time}{$ext}");
+						chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
+					}
+					if((strpos($thumbnail,'thumbnail')!==false) && is_file("thumbnail/{$origin_time}s.jpg")){
+						$thumbnail="";
+						if(!is_file("poti/thumb/{$time}s.jpg")){
+							$thumbnail="thumbnail";
 							copy("thumbnail/{$origin_time}s.jpg","poti/thumb/{$time}s.jpg");
 							chmod("poti/thumb/{$time}s.jpg",PERMISSION_FOR_DEST);
 						}
@@ -140,7 +143,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 				$pchext = ($copy_hide_animation && ($pchext==='hide_animation')) ? '.pch' : $pchext;
 				$pchext = ($copy_hide_animation && ($pchext==='hide_tgkr')) ? '.tgkr' : $pchext;
 				if(in_array($pchext,['.pch','.spch','.chi','.psd','.tgkr']) && is_file("src/{$origin_time}{$pchext}")){//動画
-					if(!$save_at_synonym && !is_file("poti/src/{$time}{$pchext}")){
+					if(!is_file("poti/src/{$time}{$pchext}")){
 						copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
 						chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 					}
