@@ -9,6 +9,9 @@
 $default='./thumbnail/ogimage.png';
 //例
 // $default='https://example.com/bbs/image.png';
+//設定しないなら初期値の
+// $default='';
+//で。
 
 //--------- 説明と設定ここまで ---------
 
@@ -29,12 +32,15 @@ $arr=[];
 				$imgfile=basename($imgfile);
 				$time=basename($time);
 				if ($imgfile){
-					if(strpos($thumbnail,'hide_')!==false){
-						$arr[$time]=$default;
+					if(strpos($thumbnail,'thumbnail_webp')!==false){
+						$arr[$time]='thumbnail/'.$time.'s.webp';
 					}elseif(strpos($thumbnail,'thumbnail')!==false){
 						$arr[$time]='thumbnail/'.$time.'s.jpg';
 					}else{
 						$arr[$time]='src/'.$imgfile;
+					}
+					if(strpos($thumbnail,'hide_')!==false){
+						$arr[$time]=$default ? $default :$arr[$time];
 					}
 				}
 			}
@@ -55,10 +61,9 @@ $filename=$arr[0];
 //画像を出力
 $img_type=mime_content_type($filename);
 if (!in_array($img_type, ['image/gif', 'image/jpeg', 'image/png','image/webp'])) {
-return;
+	return;
 }
 
 header('Content-Type: '.$img_type);
-		
 readfile($filename);
 
