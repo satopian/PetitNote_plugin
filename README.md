@@ -6,7 +6,7 @@
 - [POTI-boardからPetit Note形式に変換するログコンバータ](https://github.com/satopian/PetitNote_plugin/tree/main/logconverter/poti2)(POTI-board→Petit Note)
 
 ## 新着画像表示
-- [PetitNoteの新着画像を表示するPHP](https://github.com/satopian/PetitNote_plugin/tree/main/newimage)
+- [Petit Noteの新着画像を表示するPHP](https://github.com/satopian/PetitNote_plugin/tree/main/newimage)
 
 ## ログ修復ツール
 - [全体ログ修復ツール](https://github.com/satopian/PetitNote_plugin/tree/main/recoverlog)
