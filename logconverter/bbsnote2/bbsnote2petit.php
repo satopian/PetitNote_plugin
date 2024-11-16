@@ -277,14 +277,14 @@ sort($logfiles_arr);
 				$thread[$i][]=$res;
 
 			}
-			file_put_contents('petit/log/'.$no.'.log',$thread[$i]);
+			file_put_contents('petit/log/'.$no.'.log',implode("",$thread[$i]));
 			chmod('petit/log/'.$no.'.log',PERMISSION_FOR_LOG);	
 
 		}
 	}
 
 krsort($oya_arr);
-file_put_contents('petit/log/alllog.log',$oya_arr);
+file_put_contents('petit/log/alllog.log',implode("",$oya_arr));
 chmod('petit/log/alllog.log',PERMISSION_FOR_LOG);	
 
 echo $en ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 

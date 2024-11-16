@@ -199,10 +199,10 @@ foreach($treeline as $i => $val){
 	}
 }
 krsort($treeline);
-file_put_contents('poti/tree.log',$treeline, LOCK_EX);
+file_put_contents('poti/tree.log',implode("",$treeline), LOCK_EX);
 chmod('poti/tree.log',PERMISSION_FOR_LOG);
 krsort($newlog);
-file_put_contents('poti/img.log',$newlog,LOCK_EX);
+file_put_contents('poti/img.log',implode("",$newlog),LOCK_EX);
 chmod('poti/img.log',PERMISSION_FOR_LOG);
 
 echo $en ? 'Conversion is complete. Please do not reload.' : '変換終了。リロードしないでください。'; 
