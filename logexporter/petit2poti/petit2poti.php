@@ -139,16 +139,16 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 						}
 					}
 				}
-	
-				$pchext = ($copy_hide_animation && ($pchext==='hide_animation')) ? '.pch' : $pchext;
-				$pchext = ($copy_hide_animation && ($pchext==='hide_tgkr')) ? '.tgkr' : $pchext;
-				if(in_array($pchext,['.pch','.spch','.chi','.psd','.tgkr']) && is_file("src/{$origin_time}{$pchext}")){//動画
+				$_pchext = check_pch_ext("src/{$origin_time}");
+				//動画を表示しない設定のpch、tgkrをコピーするかどうか
+				$pchext = (!$copy_hide_animation && ((strpos($pchext,'hide')!==false))) ? "" : $_pchext;
+				if($pchext && is_file("src/{$origin_time}{$pchext}")){//動画
 					if(!is_file("poti/src/{$time}{$pchext}")){
 						copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
 						chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
 					}
 				}
-	
+
 				//フォーマット
 				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)||!preg_match('{\Ahttps?://}', $url)) $url="";
 				$name = str_replace("◆", "◇", $name);
@@ -273,4 +273,24 @@ function switch_tool($tool){
 			break;
 	}
 	return $tool;
+}
+/**
+ * pchかspchか、それともファイルが存在しないかチェック
+ * @param $filepath
+ * @return string
+ */
+function check_pch_ext ($filepath) {
+	
+	$exts=[".pch",".spch",".tgkr",".chi",".psd"];
+
+	foreach($exts as $i => $ext){
+
+		if (is_file($filepath . $ext)) {
+			if(!in_array(mime_content_type($filepath . $ext),["application/octet-stream","application/gzip","image/vnd.adobe.photoshop"])){
+				return '';
+			}
+			return $ext;
+		}
+	}
+	return '';
 }
