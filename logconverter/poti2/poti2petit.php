@@ -156,9 +156,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 			if(!$tool){
 				switch($pchext){
 					case '.pch':
-						if(is_neo(PCH_DIR . ".pch")){
-							$tool="neo";
-						}else{
+						$tool="neo";
+						if(!is_neo("petit/src/{$time}.pch")){
 							$tool="PaintBBS";
 							$pchext="";
 						}
