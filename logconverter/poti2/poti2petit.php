@@ -90,8 +90,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 
 			$no=$i+1;
 
-			// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,$pchext,$thumbnail,$painttime)
-			list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$img_md5,$_ptime,,,,$tool,$logver)
+			// list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$log_img_hash,$_ptime,,$pchext,$thumbnail,$painttime)
+			list($_no,$date,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$_time,$log_img_hash,$_ptime,,,,$tool,$logver)
 			=explode(",",rtrim(t($line[$j])).',,,,,,,,');
 			
 			$paintsec=is_numeric($_ptime) ? $_ptime :'';
@@ -187,15 +187,15 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 			$sub = $sub ? $sub : DEF_SUB; 
 			if($k===0){//スレッドの親の時
 
-				$thread[$i][]="$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
+				$thread[$i][]="$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$log_img_hash\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
 
 
 				$strcut_com=mb_strcut($com,0,120);
-				$oya_arr[$i]=	"$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
+				$oya_arr[$i]=	"$no\t$sub\t$name\t\t$strcut_com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$log_img_hash\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\toya\n";
 
 			}else{
 			
-				$res = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\tres\n";
+				$res = "$no\t$sub\t$name\t\t$com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$log_img_hash\t$tool\t$pchext\t$time\t$time\t$host\t$userid\t$hash\tres\n";
 
 				$thread[$i][]=$res;
 

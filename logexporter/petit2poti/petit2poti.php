@@ -116,7 +116,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 		foreach($logs as $k=>$val){//1スレッド分のログを処理
 	
 	
-			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
+			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_img_hash,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
 			$origin_time=$time;
 			$time=(strlen($time)>15) ? substr($time,0,-3) : $time;
 			$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
@@ -161,7 +161,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 				$now=now_date($now_time);
 				$now .=  $userid ? " ID:" . $userid : "";
 				$tool =switch_tool($tool);
-				$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$time,$log_md5,$painttime,,$pchext,$thumbnail,$tool,6\n";
+				$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$time,$log_img_hash,$painttime,,$pchext,$thumbnail,$tool,6\n";
 
 				$tree[]=$__no;
 	
