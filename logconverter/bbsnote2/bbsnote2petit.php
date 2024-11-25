@@ -193,11 +193,11 @@ sort($logfiles_arr);
 					list($W,$H)=getimagesize("petit/src/{$imgfile}");
 					list($W,$H)=image_reduction_display($W,$H,$max_w,$max_h);
 
-					if($usethumb && thumb("petit/src/",$imgfile,$time,$max_w,$max_h)){
-						$thumbnail='thumbnail';
-					}
-					if($thumbnail && thumb("petit/src/",$imgfile,$time,$max_w,$max_h,['thumbnail_webp'=>true])){
+					if($usethumb && thumb("petit/src/",$imgfile,$time,$max_w,$max_h,['thumbnail_webp'=>true])){
 						$thumbnail='thumbnail_webp';
+					}
+					if($usethumb && !$thumbnail && thumb("petit/src/",$imgfile,$time,$max_w,$max_h)){
+						$thumbnail='thumbnail';
 					}
 			
 					//webpサムネイル
