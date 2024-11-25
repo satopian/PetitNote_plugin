@@ -110,6 +110,8 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 			$_time=basename($_time);
 			$ext=basename($ext);
 			$thumbnail='';
+			$pchext='';
+
 			if($ext && is_file(IMG_DIR."{$_time}{$ext}")){//画像
 				$imgfile=$time.$ext;
 				$imgfile=basename($imgfile);
@@ -125,19 +127,18 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				if(thumb('petit/src/',$imgfile,$time,$w,$h,['thumbnail_webp'=>true])){
 					$thumbnail='thumbnail_webp';
 				}
-			}
-			if(!$thumbnail && $ext && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
-				if(!is_file("petit/thumbnail/{$time}s.jpg")){
-					copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
-					chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
+				if(!$thumbnail && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
+					if(!is_file("petit/thumbnail/{$time}s.jpg")){
+						copy(THUMB_DIR."{$_time}s.jpg","petit/thumbnail/{$time}s.jpg");
+						chmod("petit/thumbnail/{$time}s.jpg",PERMISSION_FOR_DEST);
+					}
+					if(is_file("petit/thumbnail/{$time}s.jpg")){
+						$thumbnail='thumbnail';
+					}
 				}
-				if(is_file("petit/thumbnail/{$time}s.jpg")){
-					$thumbnail='thumbnail';
-				}
+				$pchext=check_pch_ext (PCH_DIR.$_time);
 			}
 
-			$pchext=check_pch_ext (PCH_DIR.$_time);
-				
 			if($pchext){//動画
 					
 				copy(PCH_DIR."{$_time}{$pchext}","petit/src/{$time}{$pchext}");
@@ -175,9 +176,7 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 						$tool='tegaki';
 						break;
 					default:
-						if($ext){
 							$tool='';
-						}
 						break;
 				}
 			}
@@ -518,8 +517,11 @@ function switch_tool($tool){
 		case 'Tegaki';
 			$tool='tegaki';
 			break;
+		case 'Axnos Paint';
+			$tool='axnos';
+			break;
 		case 'Upload':
-			'upload';
+			$tool='upload';
 			break;
 		default:
 			$tool='';
