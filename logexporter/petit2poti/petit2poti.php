@@ -117,37 +117,34 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 	
 	
 			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_img_hash,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
+			$time = basename($time);
 			$origin_time=$time;
 			$time=(strlen($time)>15) ? substr($time,0,-3) : $time;
 			$ext = $imgfile ? '.'.pathinfo($imgfile,PATHINFO_EXTENSION ) :'';
 			$ext = basename($ext); 
 			//POTI-board形式のファイル名に変更してコピー
-				if($ext && is_file("src/$imgfile")){//画像
-					if($save_at_synonym && is_file("poti/src/{$time}{$ext}")){
-							$time=$time+1;
-					}
-					if(!is_file("poti/src/{$time}{$ext}")){
-						copy("src/$imgfile","poti/src/{$time}{$ext}");
-						chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
-					}
-					if((strpos($thumbnail,'thumbnail')!==false) && is_file("thumbnail/{$origin_time}s.jpg")){
-						$thumbnail="";
-						if(!is_file("poti/thumb/{$time}s.jpg")){
-							$thumbnail="thumbnail";
-							copy("thumbnail/{$origin_time}s.jpg","poti/thumb/{$time}s.jpg");
-							chmod("poti/thumb/{$time}s.jpg",PERMISSION_FOR_DEST);
-						}
-					}
+			if($ext && is_file("src/$imgfile")){//画像
+				if($save_at_synonym && is_file("poti/src/{$time}{$ext}")){
+					$time=$time+1;
 				}
-				$_pchext = check_pch_ext("src/{$origin_time}");
-				//動画を表示しない設定のpch、tgkrをコピーするかどうか
-				$pchext = (!$copy_hide_animation && ((strpos($pchext,'hide')!==false))) ? "" : $_pchext;
-				if($pchext && is_file("src/{$origin_time}{$pchext}")){//動画
-					if(!is_file("poti/src/{$time}{$pchext}")){
-						copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
-						chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
-					}
+				if(!is_file("poti/src/{$time}{$ext}")){
+					copy("src/$imgfile","poti/src/{$time}{$ext}");
+					chmod("poti/src/{$time}{$ext}",PERMISSION_FOR_DEST);
 				}
+				$thumbnail="";
+				if(thumb("src/",$imgfile,$time,$w,$h)){
+					$thumbnail='thumbnail';
+				}
+			}
+			$_pchext = check_pch_ext("src/{$origin_time}");
+			//動画を表示しない設定のpch、tgkrをコピーするかどうか
+			$pchext = (!$copy_hide_animation && ((strpos($pchext,'hide')!==false))) ? "" : $_pchext;
+			if($pchext && is_file("src/{$origin_time}{$pchext}")){//動画
+				if(!is_file("poti/src/{$time}{$pchext}")){
+					copy("src/{$origin_time}{$pchext}","poti/src/{$time}{$pchext}");
+					chmod("poti/src/{$time}{$pchext}",PERMISSION_FOR_DEST);
+				}
+			}
 
 				//フォーマット
 				if(!$url||!filter_var($url,FILTER_VALIDATE_URL)||!preg_match('{\Ahttps?://}', $url)) $url="";
@@ -293,4 +290,175 @@ function check_pch_ext ($filepath) {
 		}
 	}
 	return '';
+}
+
+//GD版が使えるかチェック
+function gd_check(){
+	$check = array("ImageCreate","ImageCopyResized","ImageCreateFromJPEG","ImageJPEG","ImageDestroy");
+
+	//最低限のGD関数が使えるかチェック
+	if(get_gd_ver() && (ImageTypes() & IMG_JPG)){
+		foreach ( $check as $cmd ) {
+			if(!function_exists($cmd)){
+				return false;
+			}
+		}
+	}else{
+		return false;
+	}
+
+	return true;
+}
+
+//gdのバージョンを調べる
+function get_gd_ver(){
+	if(function_exists("gd_info")){
+	$gdver=gd_info();
+	$phpinfo=$gdver["GD Version"];
+	$end=strpos($phpinfo,".");
+	$phpinfo=substr($phpinfo,0,$end);
+	$length = strlen($phpinfo)-1;
+	$phpinfo=substr($phpinfo,$length);
+	return $phpinfo;
+	} 
+	return false;
+}
+
+function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
+	$path='src/';
+	$fname=basename($fname);
+	$time=basename($time);
+	$fname=$path.$fname;
+	if(!is_file($fname)){
+		return;
+	}
+	if(!gd_check()||!function_exists("ImageCreate")||!function_exists("ImageCreateFromJPEG")){
+		return;
+	}
+	if((isset($options['webp'])||isset($options['thumbnail_webp'])) && (!function_exists("ImageWEBP")||version_compare(PHP_VERSION, '7.0.0', '<'))){
+		return;
+	}
+
+	$fsize = filesize($fname);    // ファイルサイズを取得
+	list($w,$h) = GetImageSize($fname); // 画像の幅と高さとタイプを取得
+	$w_h_size_over=($w > $max_w || $h > $max_h);
+	$f_size_over=!isset($options['toolarge']) ? ($fsize>1024*1024) : false;
+	if(!$w_h_size_over && !$f_size_over && !isset($options['webp'])){
+		return;
+	}
+	// リサイズ
+	$w_ratio = $max_w / $w;
+	$h_ratio = $max_h / $h;
+	$ratio = min($w_ratio, $h_ratio);
+	$out_w = $w_h_size_over ? ceil($w * $ratio):$w;//端数の切り上げ
+	$out_h = $w_h_size_over ? ceil($h * $ratio):$h;
+
+	switch ($mime_type = mime_content_type($fname)) {
+		case "image/gif";
+			if(!function_exists("ImageCreateFromGIF")){//gif
+				return;
+			}
+				$im_in = @ImageCreateFromGIF($fname);
+				if(!$im_in)return;
+		
+		break;
+		case "image/jpeg";
+			$im_in = @ImageCreateFromJPEG($fname);//jpg
+				if(!$im_in)return;
+			break;
+		case "image/png";
+			if(!function_exists("ImageCreateFromPNG")){//png
+				return;
+			}
+				$im_in = @ImageCreateFromPNG($fname);
+				if(!$im_in)return;
+			break;
+		case "image/webp";
+			if(!function_exists("ImageCreateFromWEBP")||version_compare(PHP_VERSION, '7.0.0', '<')){//webp
+				return;
+			}
+			$im_in = @ImageCreateFromWEBP($fname);
+			if(!$im_in)return;
+		break;
+
+		default : return;
+	}
+	// 出力画像（サムネイル）のイメージを作成
+	$exists_ImageCopyResampled = false;
+	if(function_exists("ImageCreateTrueColor")&&get_gd_ver()=="2"){
+		$im_out = ImageCreateTrueColor($out_w, $out_h);
+		if((isset($options['toolarge'])||isset($options['webp'])||isset($options['thumbnail_webp'])) && in_array($mime_type,["image/png","image/gif","image/webp"])){
+			if(function_exists("imagealphablending") && function_exists("imagesavealpha")){
+				imagealphablending($im_out, false);
+				imagesavealpha($im_out, true);//透明
+			}
+			}else{
+				if(function_exists("ImageColorAlLocate") && function_exists("imagefill")){
+					$background = ImageColorAlLocate($im_out, 0xFF, 0xFF, 0xFF);//背景色を白に
+					imagefill($im_out, 0, 0, $background);
+				}
+			}
+		// コピー＆再サンプリング＆縮小
+		if(function_exists("ImageCopyResampled")){
+			ImageCopyResampled($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $w, $h);
+			$exists_ImageCopyResampled = true;
+		}
+	}else{$im_out = ImageCreate($out_w, $out_h);}
+	// コピー＆縮小
+	if(!$exists_ImageCopyResampled) ImageCopyResized($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $w, $h);
+	if(isset($options['toolarge'])){
+		$outfile=$fname;
+	//本体画像を縮小
+		switch ($mime_type) {
+			case "image/gif";
+				if(function_exists("ImagePNG")){
+					ImagePNG($im_out, $outfile,3);
+				}else{
+					ImageJPEG($im_out, $outfile,98);
+				}
+				break;
+			case "image/jpeg";
+				ImageJPEG($im_out, $outfile,98);
+				break;
+			case "image/png";
+				if(function_exists("ImagePNG")){
+					ImagePNG($im_out, $outfile,3);
+				}else{
+					ImageJPEG($im_out, $outfile,98);
+				}
+				break;
+			case "image/webp";
+				if(function_exists("ImageWEBP")&&version_compare(PHP_VERSION, '7.0.0', '>=')){
+					ImageWEBP($im_out, $outfile,98);
+				}else{
+					ImageJPEG($im_out, $outfile,98);
+				}
+				break;
+
+			default : return;
+
+		}
+
+	}elseif(isset($options['webp'])){
+		$outfile='poti/webp/'.$time.'t.webp';
+		ImageWEBP($im_out, $outfile,90);
+
+	}elseif(isset($options['thumbnail_webp'])){
+		$outfile='poti/thumb/'.$time.'s.webp';
+		ImageWEBP($im_out, $outfile,90);
+	}else{
+		$outfile='poti/thumb/'.$time.'s.jpg';
+		// サムネイル画像を保存
+		ImageJPEG($im_out, $outfile,90);
+	}
+	// 作成したイメージを破棄
+	ImageDestroy($im_in);
+	ImageDestroy($im_out);
+
+	if(!chmod($outfile,PERMISSION_FOR_DEST)){
+		return;
+	}
+
+	return is_file($outfile);
+
 }
