@@ -262,6 +262,9 @@ function switch_tool($tool){
 		case 'tegaki';
 			$tool='Tegaki';
 			break;
+		case 'axnos';
+			$tool='Axnos Paint';
+			break;
 		case 'upload':
 			$tool='Upload';
 			break;
