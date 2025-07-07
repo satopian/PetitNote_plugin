@@ -351,7 +351,7 @@ function check_petit ($path) {
 
 //GD版が使えるかチェック
 function gd_check(){
-	$check = array("ImageCreate","ImageCopyResized","ImageCreateFromJPEG","ImageJPEG","ImageDestroy");
+	$check = array("ImageCreate","ImageCopyResized","ImageCreateFromJPEG","ImageJPEG");
 
 	//最低限のGD関数が使えるかチェック
 	if(get_gd_ver() && (ImageTypes() & IMG_JPG)){
@@ -525,9 +525,10 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 		ImageJPEG($im_out, $outfile,90);
 	}
 	// 作成したイメージを破棄
-	ImageDestroy($im_in);
-	ImageDestroy($im_out);
-
+	if(PHP_VERSION_ID < 80000) {//PHP8.0未満の時は
+		ImageDestroy($im_in);
+		ImageDestroy($im_out);
+	}
 	if(!chmod($outfile,PERMISSION_FOR_DEST)){
 		return;
 	}
