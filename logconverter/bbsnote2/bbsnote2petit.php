@@ -428,7 +428,7 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 	$out_h = $w_h_size_over ? ceil($h * $ratio):$h;
 
 	switch ($mime_type = mime_content_type($fname)) {
-		case "image/gif";
+		case "image/gif":
 			if(!function_exists("ImageCreateFromGIF")){//gif
 				return;
 			}
@@ -436,18 +436,18 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 				if(!$im_in)return;
 		
 		break;
-		case "image/jpeg";
+		case "image/jpeg":
 			$im_in = @ImageCreateFromJPEG($fname);//jpg
 				if(!$im_in)return;
 			break;
-		case "image/png";
+		case "image/png":
 			if(!function_exists("ImageCreateFromPNG")){//png
 				return;
 			}
 				$im_in = @ImageCreateFromPNG($fname);
 				if(!$im_in)return;
 			break;
-		case "image/webp";
+		case "image/webp":
 			if(!function_exists("ImageCreateFromWEBP")||version_compare(PHP_VERSION, '7.0.0', '<')){//webp
 				return;
 			}
@@ -484,24 +484,24 @@ function thumb($path,$fname,$time,$max_w,$max_h,$options=[]){
 		$outfile=$fname;
 	//本体画像を縮小
 		switch ($mime_type) {
-			case "image/gif";
+			case "image/gif":
 				if(function_exists("ImagePNG")){
 					ImagePNG($im_out, $outfile,3);
 				}else{
 					ImageJPEG($im_out, $outfile,98);
 				}
 				break;
-			case "image/jpeg";
+			case "image/jpeg":
 				ImageJPEG($im_out, $outfile,98);
 				break;
-			case "image/png";
+			case "image/png":
 				if(function_exists("ImagePNG")){
 					ImagePNG($im_out, $outfile,3);
 				}else{
 					ImageJPEG($im_out, $outfile,98);
 				}
 				break;
-			case "image/webp";
+			case "image/webp":
 				if(function_exists("ImageWEBP")&&version_compare(PHP_VERSION, '7.0.0', '>=')){
 					ImageWEBP($im_out, $outfile,98);
 				}else{
