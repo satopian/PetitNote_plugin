@@ -121,10 +121,10 @@ foreach($trees as $i=>$tree){//ツリーの読み込み
 				}
 				//webpサムネイル
 				if(!is_file("petit/webp/{$time}t.webp")){
-					thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
+					thumbnail_gd::thumb("petit/src/",$imgfile,$time,300,800,['webp'=>true]);
 				}
 				//webp s サムネイル
-				if(thumb('petit/src/',$imgfile,$time,$w,$h,['thumbnail_webp'=>true])){
+				if(thumbnail_gd::thumb('petit/src/',$imgfile,$time,$w,$h,['thumbnail_webp'=>true])){
 					$thumbnail='thumbnail_webp';
 				}
 				if(!$thumbnail && is_file(THUMB_DIR."{$_time}s.jpg")){//画像
@@ -369,7 +369,7 @@ $thumbnail_gd_ver=20250707;
 class thumbnail_gd {
 
 	public static function thumb($path,$fname,$time,$max_w,$max_h,$options=[]): ?string {
-		$path=basename($path).'/';
+		// $path=basename($path).'/';
 		$fname=basename($fname);
 		$time=basename($time);
 		if(!ctype_digit($time)) {
@@ -587,17 +587,17 @@ class thumbnail_gd {
 		
 		} elseif(isset($options['webp'])){
 
-			$outfile='poti/webp/'.$time.'t.webp';
+			$outfile='petit/webp/'.$time.'t.webp';
 			ImageWEBP($im_out, $outfile,90);
 		
 		}elseif(isset($options['thumbnail_webp'])){
 
-			$outfile=THUMB_DIR.$time.'s.webp';
+			$outfile="petit/thumbnail/{$time}s.webp";
 			ImageWEBP($im_out, $outfile,90);
 
 		}else{
 
-			$outfile=THUMB_DIR.$time.'s.jpg';
+			$outfile="petit/thumbnail/{$time}s.jpg";
 			// サムネイル画像を保存
 			ImageJPEG($im_out, $outfile,90);
 
