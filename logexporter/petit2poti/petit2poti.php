@@ -1,9 +1,9 @@
 <?php
 
 // Petit Note → POTI-board ログコンバータ。
-// (c)2022-2024 さとぴあ(satopian) 
+// (c)2022-2025 さとぴあ(satopian) 
 // Licence MIT
-// lot.240411
+// lot.251216
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -254,7 +254,7 @@ function switch_tool($tool){
 			$tool='Shi-Painter';
 			break;
 		case 'chi':
-			$tool='ChickenPaint';
+			$tool='litaChix';
 			break;
 		case 'klecks':
 			$tool='Klecks';
