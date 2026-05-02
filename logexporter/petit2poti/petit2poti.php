@@ -1,9 +1,10 @@
 <?php
 
 // Petit Note → POTI-board ログコンバータ。
-// (c)2022-2025 さとぴあ(satopian) 
+// (c)2022-2026 さとぴあ(satopian) 
 // Licence MIT
-// lot.251216
+// lot.20260502
+
 
 /* ------------- 設定項目ここから ------------- */
 
@@ -68,7 +69,7 @@ $fp=fopen('log/alllog.log',"r");
 if(!$fp){
 	error($en?'Failed to read the Petit Note log file.':'Petit Noteのログファイルの読み込みに失敗しました。');
 }
-
+$log_nos=[];
 while ($_line = fgets($fp)) {
 		if(!trim($_line)){
 			continue;
@@ -109,6 +110,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 
 	$__no=1;
 	$newlog=[];
+	$treeline=[];
 	foreach($arr_logs as $i=>$logs){
 	
 		$tree=[];
@@ -215,7 +217,7 @@ function lang_en(){//言語が日本語以外ならtrue。
 // 日付
 function now_date($time){
 	$youbi = array('日','月','火','水','木','金','土');
-	$yd = $youbi[date("w", $time)] ;
+	$yd = $youbi[(int)date("w", $time)] ;
 	$date = date(DATE_FORMAT, $time);
 	$date = str_replace("<1>", $yd, $date); //漢字の曜日セット1
 	$date = str_replace("<2>", $yd.'曜', $date); //漢字の曜日セット2

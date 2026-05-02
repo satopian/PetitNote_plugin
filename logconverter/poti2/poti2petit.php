@@ -48,6 +48,7 @@ if ($err = check_file(__DIR__.'/'.TREEFILE)) {
 }
 
 $fp=fopen(LOGFILE,"r");
+$line=[];
 while($_line = fgets($fp)){
 	
 	if(!trim($_line)){
@@ -60,6 +61,7 @@ while($_line = fgets($fp)){
 }
 
 $tp=fopen(TREEFILE,"r");
+$trees=[];
 while($_tree = fgets($tp)){
 	if(!trim($_tree)){
 		continue;
@@ -79,6 +81,8 @@ check_dir('petit/thumbnail');
 check_dir('petit/webp');
 
 $lineindex = get_lineindex($line); // 逆変換テーブル作成
+$no=1;
+$oya_arr=[];
 foreach($trees as $i=>$tree){//ツリーの読み込み
 		$treeline = explode(",", rtrim($tree));
 		// レス省略
