@@ -157,7 +157,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 				$com = str_replace('"\n"',"<br>",$com);	//改行文字の前に HTMLの改行タグ
 				$email='';
 				$now_time = substr($time,0,-3);
-				$now=now_date($now_time);
+				$now=now_date((int)$now_time);
 				$now .=  $userid ? " ID:" . $userid : "";
 				$tool =switch_tool($tool);
 				$newlog[]="$__no,$now,$name,$email,$sub,$com,$url,$host,$hash,$ext,$w,$h,$time,$log_img_hash,$painttime,,$pchext,$thumbnail,$tool,6\n";
@@ -174,6 +174,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 unset($oya);
 
 //ツリーログ
+$_treeline=[];
 foreach($treeline as $val){
 	list($_oya,)=explode(',',rtrim($val));
 	$_treeline[$_oya]=$val;
@@ -215,7 +216,7 @@ function lang_en(){//言語が日本語以外ならtrue。
 }
 
 // 日付
-function now_date($time){
+function now_date(int $time){
 	$youbi = array('日','月','火','水','木','金','土');
 	$yd = $youbi[(int)date("w", $time)] ;
 	$date = date(DATE_FORMAT, $time);
@@ -225,18 +226,18 @@ function now_date($time){
 }
 
 //タブ除去
-function t($str){
+function t(?string $str){
 	return str_replace("\t","",$str);
 }
 
-function check_dir ($path) {
+function check_dir (?string $path) {
 
 	if (!is_dir($path)) {
 			mkdir($path, PERMISSION_FOR_DIR,true);
 			chmod($path, PERMISSION_FOR_DIR);
 	}
 }
-function check_petit ($path) {
+function check_petit (?string $path) {
 
 	if (!is_dir($path)) {
 			mkdir($path, PERMISSION_FOR_POTI,true);
@@ -244,7 +245,7 @@ function check_petit ($path) {
 	}
 }
 
-function switch_tool($tool){
+function switch_tool(?string $tool){
 	switch($tool){
 		case 'neo':
 			$tool='PaintBBS NEO';
@@ -281,7 +282,7 @@ function switch_tool($tool){
  * @param $filepath
  * @return string
  */
-function check_pch_ext ($filepath) {
+function check_pch_ext (?string $filepath) {
 	
 	$exts=[".pch",".spch",".tgkr",".chi",".psd"];
 
@@ -297,40 +298,50 @@ function check_pch_ext ($filepath) {
 	return '';
 }
 
-// thumbnail_gd.inc.php for PetitNote (C)さとぴあ @satopian 2021 - 2025
+// thumbnail_gd.inc.php for PetitNote (C)さとぴあ @satopian 2021-2026 MIT License
 // https://paintbbs.sakura.ne.jp/
 // originalscript (C)SakaQ 2005 http://www.punyu.net/php/
 
-$thumbnail_gd_ver=20250707;
-// defined('PERMISSION_FOR_DEST') or define('PERMISSION_FOR_DEST', 0606); //config.phpで未定義なら0606
+$thumbnail_gd_ver=20260501;
 class thumbnail_gd {
 
-	public static function thumb($path,$fname,$time,$max_w,$max_h,$options=[]): ?string {
-		// $path=basename($path).'/';
+/**
+ * @param int|string|null $max_w
+ * @param int|string|null $max_h
+*/
+
+	public static function thumb(?string $path,?string $fname,?string $time,$max_w,$max_h,array $options=[]): string {
+		$path=basename($path).'/';
 		$fname=basename($fname);
 		$time=basename($time);
 		if(!ctype_digit($time)) {
-			return null;
+			return '';
 		}
 		$fname=$path.$fname;
 		if(!is_file($fname)){
-			return null;
+			return '';
 		}
 		if(!self::gd_check()||!function_exists("ImageCreate")||!function_exists("ImageCreateFromJPEG")){
-			return null;
+			return '';
 		}
-		if((isset($options['webp'])||isset($options['thumbnail_webp'])) && !function_exists("ImageWEBP")){
-			return null;
+		if(isset($options['png2webp'])||isset($options['png2jpeg'])){
+			$options['2webp']=true;//互換処理
+		}
+		if((isset($options['webp'])||isset($options['2webp'])||isset($options['thumbnail_webp'])) && !function_exists("ImageWEBP")){
+			return '';
+		}
+		if((isset($options['avif'])||isset($options['2avif'])||isset($options['thumbnail_avif'])) && !function_exists("ImageAVIF")){
+			return '';
 		}
 
 		$fsize = filesize($fname); // ファイルサイズを取得
 		list($w,$h) = GetImageSize($fname); // 画像の幅と高さを取得
 		$w_h_size_over = $max_w && $max_h && ($w > $max_w || $h > $max_h);
 		$f_size_over = !isset($options['toolarge']) ? ($fsize>1024*1024) : false;
-		if(!$w_h_size_over && !$f_size_over && !isset($options['webp']) && !isset($options['png2webp']) && !isset($options['png2jpeg'])){
-			return null;
+		if(!$w_h_size_over && !$f_size_over && !isset($options['webp']) && !isset($options['2webp']) && !isset($options['2png']) && !isset($options['2jpeg'])){//リサイズも変換もしない
+			return '';
 		}
-		if(!$w_h_size_over || isset($options['png2jpeg']) || isset($options['png2webp']) || !$max_w || !$max_h){//リサイズしない
+		if(!$w_h_size_over || isset($options['2webp']) || isset($options['2png']) || !$max_w || !$max_h){//リサイズしない
 			$out_w = $w;
 			$out_h = $h;
 		}else{// リサイズ
@@ -343,7 +354,7 @@ class thumbnail_gd {
 
 		$mime_type = mime_content_type($fname);
 		if(!$im_in = self::createImageResource($fname,$mime_type)){
-			return null;
+			return '';
 		};
 		// 出力画像（サムネイル）のイメージを作成
 		if(function_exists("ImageCreateTrueColor")){
@@ -370,8 +381,8 @@ class thumbnail_gd {
 			ImageCopyResized($im_out, $im_in, 0, 0, 0, 0, $out_w, $out_h, $w, $h);//"ImageCopyResampled"が無効の時
 		}
 
-		if(isset($options['toolarge'])){
-			$outfile = self::overwriteResizedImage($im_out, $fname, $mime_type);
+		if(isset($options['toolarge'])){//元画像を縮小してPNGで上書き
+			$outfile = self::overwriteResizedImageWithPNG($im_out, $fname);
 		}else{
 			$outfile = self::createThumbnailImage($im_out, $time, $options);
 		}
@@ -380,17 +391,17 @@ class thumbnail_gd {
 		self::safeImageDestroy($im_out);
 
 		if(!$outfile){
-			return null;
+			return '';
 		}
 
 		if(!chmod($outfile,PERMISSION_FOR_DEST)){
-			return null;
+			return '';
 		}
 
 		if(is_file($outfile)){
 			return $outfile;
 		}
-		return null;
+		return '';
 
 	}
 	//GD版が使えるかチェック
@@ -414,7 +425,10 @@ class thumbnail_gd {
 		return true;
 	}
 
-	//GDのイメージを破棄
+	/**
+	 * GDのイメージを破棄 
+	 * @param resource|\GdImage|null $gdImage
+	*/
 	private static function safeImageDestroy($gdImage): void {
 		if(PHP_VERSION_ID < 80000) {//PHP8.0未満の時は
 			imagedestroy($gdImage);
@@ -422,23 +436,26 @@ class thumbnail_gd {
 	}
 
 	// 透明度の処理を行う必要があるかを判断
-	private static function isTransparencyEnabled($options, $mime_type): bool {
+	private static function isTransparencyEnabled(array $options,?string $mime_type): bool {
 		// 透明度を扱うオプションが設定されているか確認
-		$transparencyOptionsSet = isset($options['toolarge']) || isset($options['webp']) || isset($options['thumbnail_webp']) || isset($options['png2webp']);
+		$transparencyOptionsSet = isset($options['toolarge']) || isset($options['webp']) || isset($options['thumbnail_webp']) || isset($options['2webp']) || isset($options['2png']);
 		
 		// 対象の画像形式で透明度がサポートされているか確認
-		$transparencySupportedFormats = ["image/png", "image/gif", "image/webp"];
+		$transparencySupportedFormats = ["image/png", "image/gif", "image/webp", "image/avif"];
 		
 		// 透明度を扱うための関数が存在するか確認
 		$transparencyFunctionsAvailable = function_exists("imagealphablending") && function_exists("imagesavealpha");
 		
 		return $transparencyOptionsSet && in_array($mime_type, $transparencySupportedFormats) && $transparencyFunctionsAvailable;
 	}
-	//各画像フォーマットのリソースを作成
-	private static function createImageResource($fname,$mime_type) {
+	/**
+	 *各画像フォーマットのリソースを作成
+	 * @param string|bool $mime_type
+	 */
+	private static function createImageResource(?string $fname,$mime_type) {
 		switch ($mime_type) {
 			case "image/gif":
-				if(!function_exists("ImageCreateFromGIF")){//gif
+				if(!function_exists("ImageCreateFromGIF")) {//gif
 					return null;
 				}
 					$im_in = @ImageCreateFromGIF($fname);
@@ -449,17 +466,24 @@ class thumbnail_gd {
 					if(!$im_in)return null;
 				break;
 			case "image/png":
-				if(!function_exists("ImageCreateFromPNG")){//png
+				if(!function_exists("ImageCreateFromPNG")) {//png
 					return null;
 				}
 				$im_in = @ImageCreateFromPNG($fname);
 					if(!$im_in)return null;
 				break;
 			case "image/webp":
-				if(!function_exists("ImageCreateFromWEBP")){//webp
+				if(!function_exists("ImageCreateFromWEBP")) {//webp
 					return null;
 				}
 					$im_in = @ImageCreateFromWEBP($fname);
+					if(!$im_in)return null;
+				break;
+			case "image/avif":
+				if(!function_exists("ImageCreateFromAVIF")) {//avif
+					return null;
+				}
+					$im_in = @ImageCreateFromAVIF($fname);
 					if(!$im_in)return null;
 				break;
 
@@ -468,73 +492,69 @@ class thumbnail_gd {
 		return $im_in;
 	}
 
-	//縮小した画像で上書き
-	private static function overwriteResizedImage($im_out, $fname, $mime_type): ?string {
+	/**
+	 * 縮小してPNGで上書き 
+	 * @param resource|\GdImage|null $im_out
+	*/
+	private static function overwriteResizedImageWithPNG($im_out, ?string $fname): ?string {
 		$outfile=(string)$fname;
 		//本体画像を縮小
-		switch ($mime_type) {
-			case "image/gif":
-				if(function_exists("ImagePNG")){
-					ImagePNG($im_out, $outfile,3);
-				}else{
-					ImageJPEG($im_out, $outfile,98);
-				}
-				return $outfile;
-			case "image/jpeg":
+			if(function_exists("ImagePNG")) {
+				ImagePNG($im_out, $outfile,3);
+			} else {
 				ImageJPEG($im_out, $outfile,98);
-				return $outfile;
-			case "image/png":
-				if(function_exists("ImagePNG")){
-					ImagePNG($im_out, $outfile,3);
-				}else{
-					ImageJPEG($im_out, $outfile,98);
-				}
-				return $outfile;
-			case "image/webp":
-				if(function_exists("ImageWEBP")){
-					ImageWEBP($im_out, $outfile,98);
-				}else{
-					ImageJPEG($im_out, $outfile,98);
-				}
-				return $outfile;
-
-			default : return null;
-
-		}
-	}
-	//サムネイル作成
-	private static function createThumbnailImage($im_out, $time, $options): ?string {
-
-		if(isset($options['png2jpeg'])){
-
-			$outfile=TEMP_DIR.$time.'.jpg.tmp';//一時ファイル
-			ImageJPEG($im_out, $outfile,98);
-
-		} elseif(isset($options['png2webp'])){
-
-			if(function_exists("ImageWEBP")){
-				$outfile=TEMP_DIR.$time.'.webp.tmp';//一時ファイル
-				ImageWEBP($im_out, $outfile,98);
-
-			}else{
-				$outfile=TEMP_DIR.$time.'.jpg.tmp';//一時ファイル
-				ImageJPEG($im_out, $outfile,98);
-
 			}
-		
-		} elseif(isset($options['webp'])){
+		return $outfile;
+	}
+	/**
+	 * サムネイル作成 
+	 * @param resource|\GdImage|null $im_out
+	*/
+	private static function createThumbnailImage($im_out,?string $time,array $options): ?string {
 
-			$outfile="poti/webp/{$time}t.webp";
+		if(isset($options['2png'])) {
+
+			$outfile=TEMP_DIR.$time.'.png.tmp';//一時ファイル
+			ImagePNG($im_out, $outfile,3);
+		
+		} elseif(isset($options['2jpeg'])) {
+
+			$outfile=TEMP_DIR.$time.'.jpeg.tmp';//一時ファイル
+			imagejpeg($im_out, $outfile,98);
+
+		} elseif(isset($options['2webp'])) {
+
+			$outfile=TEMP_DIR.$time.'.webp.tmp';//一時ファイル
+			ImageWEBP($im_out, $outfile,98);
+		
+		} elseif(isset($options['2avif'])) {
+
+			$outfile=TEMP_DIR.$time.'.avif.tmp';//一時ファイル
+			imageavif($im_out, $outfile,90);
+		
+		} elseif(isset($options['webp'])) {
+
+			$outfile='webp/'.$time.'t.webp';
 			ImageWEBP($im_out, $outfile,90);
 		
-		}elseif(isset($options['thumbnail_webp'])){
+		} elseif(isset($options['avif'])) {
 
-			$outfile="poti/thumb/{$time}s.webp";
+			$outfile='avif/'.$time.'t.avif';
+			imageavif($im_out, $outfile,80);
+		
+		} elseif(isset($options['thumbnail_webp'])) {
+
+			$outfile=THUMB_DIR.$time.'s.webp';
 			ImageWEBP($im_out, $outfile,90);
 
-		}else{
+		} elseif(isset($options['thumbnail_avif'])) {
 
-			$outfile="poti/thumb/{$time}s.jpg";
+			$outfile=THUMB_DIR.$time.'s.avif';
+			imageavif($im_out, $outfile,80);
+
+		} else {
+
+			$outfile=THUMB_DIR.$time.'s.jpg';
 			// サムネイル画像を保存
 			ImageJPEG($im_out, $outfile,90);
 
