@@ -11,7 +11,7 @@ $logfiles_arr =(glob('./log/*.log', GLOB_BRACE));//ログファイルをglob
 		$line =fgets($fp);
 		if(trim($line)){
 
-			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$img_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",trim($line));
+			[$no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$img_md5,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya]=explode("\t",trim($line));
 			if($oya==='oya'){
 				$strcut_com=mb_strcut($com,0,120);
 				$newline = "$no\t$sub\t$name\t$verified\t$strcut_com\t$url\t$imgfile\t$w\t$h\t$thumbnail\t$painttime\t$img_md5\t$tool\t$pchext\t$time\t$first_posted_time\t$host\t$userid\t$hash\toya\n";

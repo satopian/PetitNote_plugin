@@ -74,7 +74,7 @@ while ($_line = fgets($fp)) {
 		if(!trim($_line)){
 			continue;
 		}
-		list($_no)=explode("\t",trim($_line));
+		[$_no]=explode("\t",trim($_line));
 		$log_nos[]=$_no;	
 	}
 fclose($fp);
@@ -118,7 +118,7 @@ foreach($log_nos as $i=>$log_no){//ログファイルを一つずつ開いて読
 		foreach($logs as $k=>$val){//1スレッド分のログを処理
 	
 	
-			list($no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_img_hash,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya)=explode("\t",$val);
+			[$no,$sub,$name,$verified,$com,$url,$imgfile,$w,$h,$thumbnail,$painttime,$log_img_hash,$tool,$pchext,$time,$first_posted_time,$host,$userid,$hash,$oya]=explode("\t",$val);
 			$time = basename($time);
 			$origin_time=$time;
 			$time=(strlen($time)>15) ? substr($time,0,-3) : $time;
@@ -176,7 +176,7 @@ unset($oya);
 //ツリーログ
 $_treeline=[];
 foreach($treeline as $val){
-	list($_oya,)=explode(',',rtrim($val));
+	[$_oya,]=explode(',',rtrim($val));
 	$_treeline[$_oya]=$val;
 }
 $treeline=$_treeline;
@@ -335,7 +335,7 @@ class thumbnail_gd {
 		}
 
 		$fsize = filesize($fname); // ファイルサイズを取得
-		list($w,$h) = GetImageSize($fname); // 画像の幅と高さを取得
+		[$w,$h] = GetImageSize($fname); // 画像の幅と高さを取得
 		$w_h_size_over = $max_w && $max_h && ($w > $max_w || $h > $max_h);
 		$f_size_over = !isset($options['toolarge']) ? ($fsize>1024*1024) : false;
 		if(!$w_h_size_over && !$f_size_over && !isset($options['webp']) && !isset($options['2webp']) && !isset($options['2png']) && !isset($options['2jpeg'])){//リサイズも変換もしない

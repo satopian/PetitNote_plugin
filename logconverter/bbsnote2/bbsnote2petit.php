@@ -158,11 +158,11 @@ sort($logfiles_arr);
 			$no=$i+1;
 			if($k===0){//スレッドの親
 				if($relm){//relm
-				list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$painttime,)
+				[$threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host,,,,,$agent,,$filename,$W,$H,,$_thumbnail,$pch,,,$painttime,]
 					=explode("<>",$val);
 				}else{//BBSNote
 				$painttime='';
-				list($_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,,$applet,$_thumbnail)
+				[$_no,$name,$now,$sub,$email,$url,$com,$host,$ip,$agent,$filename,$W,$H,,,$pch,,$applet,$_thumbnail]
 				=explode("\t",$val."\t"."\t"."\t"."\t"."\t"."\t"."\t"."\t"."\t");
 				$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
 				$time=(int)strtotime($time);//strからUNIXタイムスタンプ
@@ -190,8 +190,8 @@ sort($logfiles_arr);
 					copy("data/$filename","petit/src/{$imgfile}");
 					chmod("petit/src/{$imgfile}",PERMISSION_FOR_DEST);
 
-					list($W,$H)=getimagesize("petit/src/{$imgfile}");
-					list($W,$H)=image_reduction_display($W,$H,$max_w,$max_h);
+					[$W,$H]=getimagesize("petit/src/{$imgfile}");
+					[$W,$H]=image_reduction_display($W,$H,$max_w,$max_h);
 
 					if($usethumb && thumbnail_gd::thumb("petit/src/",$imgfile,$time,$max_w,$max_h,['thumbnail_webp'=>true])){
 						$thumbnail='thumbnail_webp';
@@ -257,10 +257,10 @@ sort($logfiles_arr);
 				unset($threadno,$_no,$now,$name,$sub,$email,$url,$com,$time,$ip,$host,$agent,$filename,$W,$painttime,$thumbnail,$pch,$applet);
 				$W=$H=$pch=$painttime=$ext=$time=$ip='';
 				if($relm){//relm
-					list($threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host)
+					[$threadno,$_no,$now,$name,,$sub,$email,$url,$com,$time,$ip,$host]
 					=explode("<>",$val);
 				}else{//BBSNote
-					list($_no,$name,$now,$com,,$host,$email,$url)
+					[$_no,$name,$now,$com,,$host,$email,$url]
 					=explode("\t",$val);
 					$time= $now ? preg_replace('/\(.+\)/', '', $now):0;//曜日除去
 					$time=(int)strtotime($time);//strからUNIXタイムスタンプ
@@ -410,7 +410,7 @@ class thumbnail_gd {
 		}
 
 		$fsize = filesize($fname); // ファイルサイズを取得
-		list($w,$h) = GetImageSize($fname); // 画像の幅と高さを取得
+		[$w,$h] = GetImageSize($fname); // 画像の幅と高さを取得
 		$w_h_size_over = $max_w && $max_h && ($w > $max_w || $h > $max_h);
 		$f_size_over = !isset($options['toolarge']) ? ($fsize>1024*1024) : false;
 		if(!$w_h_size_over && !$f_size_over && !isset($options['webp']) && !isset($options['2webp']) && !isset($options['2png']) && !isset($options['2jpeg'])){//リサイズも変換もしない
